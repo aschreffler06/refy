@@ -50,6 +50,13 @@ export const ChatCommandMetadata: {
         dm_permission: true,
         default_member_permissions: undefined,
     },
+    CREATE_TICKET: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.createTicket', Language.Default),
+        description: Lang.getRef('commandDescs.createTicket', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+    },
 };
 
 export const MessageCommandMetadata: {

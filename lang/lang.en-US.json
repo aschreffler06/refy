@@ -124,6 +124,12 @@
                         ]
                     }
                 ]
+            },
+            "createTicket": {
+                "title": "Creating a ticket",
+                "description": [
+                    "Tickets are meant to be used for bot related support, not for anything concerning a specific tournament. If you are looking for support for a tournament, please contact the tournament organizer directly."
+                ]
             }
         },
         "validationEmbeds": {
@@ -187,10 +193,15 @@
         "bot": {
             "description": "{{REF:links.templateEmbed}} helps give developers a starting point for new Discord bots, so that much of the initial setup can be avoided and developers can instead focus on meaningful bot features."
         },
+        "button": {
+            "continue": "Continue",
+            "cancel": "Cancel"
+        },
         "chatCommands": {
             "help": "help",
             "info": "info",
-            "test": "test"
+            "test": "test",
+            "createTicket": "create-ticket"
         },
         "userCommands": {
             "viewDateJoined": "View Date Joined"
@@ -204,7 +215,8 @@
         "commandDescs": {
             "help": "Find help or contact support.",
             "info": "View bot info.",
-            "test": "Run the test command."
+            "test": "Run the test command.",
+            "createTicket": "Create a ticket for bot support."
         },
         "argDescs": {
             "helpOption": "Option.",
@@ -269,6 +281,9 @@
             "about": "About",
             "translate": "Translate",
             "dev": "Dev"
+        },
+        "responses": {
+            "commandCancelled": "Command cancelled."
         },
         "yesNo": {
             "yes": "Yes",
