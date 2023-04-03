@@ -1,8 +1,18 @@
+/**
+ * @file Ticket Create Command
+ * @description Command to create a ticket concerning bot issues
+ * @module commands/ticket-create-command
+ * @category commands
+ * @subcategory chat
+ */
+
 import {
     ButtonStyle,
+    CacheType,
     ChatInputCommandInteraction,
     ComponentType,
     ModalBuilder,
+    ModalSubmitInteraction,
     PermissionsString,
     TextInputStyle,
 } from 'discord.js';
@@ -22,25 +32,19 @@ export class CreateTicketCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
-        let ticketFormatPrompt = await InteractionUtils.send(
+        let ticketCreatePrompt = await InteractionUtils.send(
             intr,
             {
-                embeds: [Lang.getEmbed('displayEmbeds.createTicket', data.lang)],
+                content: `Tickets are for bot issues only. If you have a tournament related issues please dm the host.`,
                 components: [
                     {
                         type: ComponentType.ActionRow,
                         components: [
                             {
                                 type: ComponentType.Button,
-                                customId: 'ticketContinue',
-                                label: Lang.getRef('button.continue', data.lang),
+                                customId: 'ticketCreate',
+                                label: Lang.getRef('button.create', data.lang),
                                 style: ButtonStyle.Primary,
-                            },
-                            {
-                                type: ComponentType.Button,
-                                customId: 'ticketCancel',
-                                label: Lang.getRef('button.cancel', data.lang),
-                                style: ButtonStyle.Danger,
                             },
                         ],
                     },
@@ -49,112 +53,73 @@ export class CreateTicketCommand implements Command {
             true
         );
 
-        const ticketFormatResult = await CollectorUtils.collectByButton(
-            ticketFormatPrompt,
-            // Retrieve Result
-            async buttonInteraction => {
-                switch (buttonInteraction.customId) {
-                    case 'ticketContinue': {
-                        return { intr: buttonInteraction, value: 'Continue' };
-                    }
-                    case 'ticketCancel': {
-                        return { intr: buttonInteraction, value: 'Cancel' };
-                    }
-                    default:
-                        return;
-                }
-            },
-            // Options
-            {
-                time: 120000,
-                reset: true,
-                target: intr.user,
-                stopFilter: message => message.content.toLowerCase() === 'stop',
-                onExpire: async () => {
-                    await intr.channel?.send({
-                        content: 'Too slow! Try being more decisive next time.',
-                    });
-                },
+        const ticketCreateResult = await CollectorUtils.collectByModal(
+            ticketCreatePrompt,
+            new ModalBuilder({
+                customId: 'ticketCreateModal',
+                title: 'Create Ticket',
+                components: [
+                    {
+                        type: ComponentType.ActionRow,
+                        components: [
+                            {
+                                type: ComponentType.TextInput,
+                                customId: 'ticketTitle',
+                                label: 'Ticket Title',
+                                placeholder: 'Summarize Issue',
+                                style: TextInputStyle.Short,
+                                required: true,
+                            },
+                        ],
+                    },
+                    {
+                        type: ComponentType.ActionRow,
+                        components: [
+                            {
+                                type: ComponentType.TextInput,
+                                customId: 'ticketDescription',
+                                label: 'Ticket Description',
+                                placeholder: 'Describe Issue',
+                                style: TextInputStyle.Paragraph,
+                                required: true,
+                            },
+                        ],
+                    },
+                ],
+            }),
+
+            async modalSubmitInteraction => {
+                return await ticketRetriever(modalSubmitInteraction);
             }
         );
 
-        if (!ticketFormatResult) {
-            return;
-        }
-
-        if (ticketFormatResult.value === 'Cancel') {
-            await InteractionUtils.send(
-                ticketFormatResult.intr,
-                Lang.getRef('responses.commandCancelled', data.lang),
-                true
-            );
-            return;
-        } else {
-            // Create modal for them to submit the ticket
-            const ticketInformationResult = await CollectorUtils.collectByModal(
-                ticketFormatPrompt,
-                // Retrieve Result
-                new ModalBuilder({
-                    customId: 'ticketModal',
-                    title: 'Create a ticket',
-                    components: [
-                        {
-                            type: ComponentType.ActionRow,
-                            components: [
-                                {
-                                    type: ComponentType.TextInput,
-                                    customId: 'ticketTitle',
-                                    placeholder: 'What is the main issue?',
-                                    label: 'Ticket Title',
-                                    style: TextInputStyle.Short,
-                                },
-                            ],
-                        },
-                        {
-                            type: ComponentType.ActionRow,
-                            components: [
-                                {
-                                    type: ComponentType.TextInput,
-                                    customId: 'ticketDescription',
-                                    placeholder: 'Describe the issue.',
-                                    label: 'Ticket Description',
-                                    style: TextInputStyle.Paragraph,
-                                },
-                            ],
-                        },
-                    ],
-                }),
-
-                async modalInteraction => {
-                    const ticketTitle = modalInteraction.components[0].components[0];
-                    const ticketDescription = modalInteraction.components[1].components[0];
-                    return {
-                        intr: modalInteraction,
-                        value: { title: ticketTitle, description: ticketDescription },
-                    };
-                },
-                // Options
-                {
-                    time: 120000,
-                    reset: true,
-                    target: intr.user,
-                    stopFilter: message => message.content.toLowerCase() === 'stop',
-                    onExpire: async () => {
-                        await intr.channel?.send('Too slow! Try being more decisive next time.');
-                    },
-                }
-            );
-
-            if (!ticketInformationResult) {
-                return;
-            }
-
-            // send message in channel
-            await InteractionUtils.send(
-                ticketInformationResult.intr,
-                `Ticket Title: ${ticketInformationResult.value.title}\nTicket Description: ${ticketInformationResult.value.description}`,
-                true
-            );
-        }
+        // send message in channel
+        //TODO: ticket numbers
+        await InteractionUtils.send(
+            ticketCreateResult.intr,
+            `Your ticket has been created. Please wait for a staff member to respond. (this is a lie i haven't finished the functionality for this yet)`,
+            true
+        );
     }
+}
+
+async function ticketRetriever(
+    intr: ModalSubmitInteraction<CacheType>
+): Promise<{ intr: ModalSubmitInteraction; value: { title: string; description: string } }> {
+    const ticketTitle = intr.components[0].components[0];
+    const ticketDescription = intr.components[1].components[0];
+    if (
+        ticketTitle.type !== ComponentType.TextInput ||
+        ticketDescription.type !== ComponentType.TextInput
+    ) {
+        return;
+    }
+
+    return {
+        intr: intr,
+        value: {
+            title: ticketTitle.value,
+            description: ticketDescription.value,
+        },
+    };
 }

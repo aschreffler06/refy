@@ -124,12 +124,6 @@
                         ]
                     }
                 ]
-            },
-            "createTicket": {
-                "title": "Creating a ticket",
-                "description": [
-                    "Tickets are meant to be used for bot related support, not for anything concerning a specific tournament. If you are looking for support for a tournament, please contact the tournament organizer directly."
-                ]
             }
         },
         "validationEmbeds": {
@@ -195,7 +189,8 @@
         },
         "button": {
             "continue": "Continue",
-            "cancel": "Cancel"
+            "cancel": "Cancel",
+            "create": "Create"
         },
         "chatCommands": {
             "help": "help",
