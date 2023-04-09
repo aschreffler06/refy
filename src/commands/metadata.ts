@@ -1,5 +1,7 @@
 import {
     ApplicationCommandType,
+    PermissionFlagsBits,
+    PermissionsBitField,
     RESTPostAPIChatInputApplicationCommandsJSONBody,
     RESTPostAPIContextMenuApplicationCommandsJSONBody,
 } from 'discord.js';
@@ -49,6 +51,15 @@ export const ChatCommandMetadata: {
         description_localizations: Lang.getRefLocalizationMap('commandDescs.test'),
         dm_permission: true,
         default_member_permissions: undefined,
+    },
+    AUCTION_SETUP: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.auctionSetup', Language.Default),
+        description: Lang.getRef('commandDescs.auctionSetup', Language.Default),
+        dm_permission: true,
+        default_member_permissions: PermissionsBitField.resolve([
+            PermissionFlagsBits.ManageGuild,
+        ]).toString(),
     },
     CREATE_TICKET: {
         type: ApplicationCommandType.ChatInput,

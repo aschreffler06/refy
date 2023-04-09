@@ -196,6 +196,7 @@
             "help": "help",
             "info": "info",
             "test": "test",
+            "auctionSetup": "auction-setup",
             "createTicket": "create-ticket"
         },
         "userCommands": {
@@ -211,6 +212,7 @@
             "help": "Find help or contact support.",
             "info": "View bot info.",
             "test": "Run the test command.",
+            "auctionSetup": "Setup an auction.",
             "createTicket": "Create a ticket for bot support."
         },
         "argDescs": {

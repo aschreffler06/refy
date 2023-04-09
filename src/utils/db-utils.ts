@@ -34,4 +34,14 @@ export class DatabaseUtils {
             process.exit(1);
         }
     }
+
+    public static async disconnectDBForTesting(): Promise<void> {
+        try {
+            await mongoose.connection.dropDatabase();
+            await mongoose.connection.close();
+        } catch (error) {
+            console.log(error);
+            process.exit(1);
+        }
+    }
 }

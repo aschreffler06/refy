@@ -1,9 +1,5 @@
 /**
- * @file Ticket Create Command
  * @description Command to create a ticket concerning bot issues
- * @module commands/ticket-create-command
- * @category commands
- * @subcategory chat
  */
 
 import {

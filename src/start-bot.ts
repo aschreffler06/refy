@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 
 import { Button } from './buttons/index.js';
 import {
+    AuctionSetupCommand,
     CreateTicketCommand,
     HelpCommand,
     InfoCommand,
@@ -68,6 +69,7 @@ async function start(): Promise<void> {
         new HelpCommand(),
         new InfoCommand(),
         new TestCommand(),
+        new AuctionSetupCommand(),
         new CreateTicketCommand(),
 
         // Message Context Commands

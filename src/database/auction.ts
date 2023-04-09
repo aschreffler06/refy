@@ -2,22 +2,14 @@ import { model, Schema } from 'mongoose';
 
 type IAuction = {
     name: string;
-    users: 
+    bidders: string[];
 };
 
-const mapSchema = new Schema<IMap>({
-    _id: { type: Number, required: true },
-    mod: {
-        type: [String],
-        // TODO: Make these able to be appended to each other
-        enum: Constants.TOURNEY_ROUNDS,
-        required: true,
-    },
-    slot: { type: Number, required: true },
-    multiplier: { type: Number, default: 1, required: true },
-    comment: { type: String },
+const auctionSchema = new Schema<IAuction>({
+    name: { type: String, required: true },
+    bidders: { type: [String], required: true },
 });
 
-const Map = model('Map', mapSchema);
+const Auction = model('Auction', auctionSchema);
 
-export { Map, mapSchema, IMap };
+export { Auction };
