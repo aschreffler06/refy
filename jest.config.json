@@ -1,0 +1,12 @@
+{
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "rootDir": ".",
+    "modulePaths": ["<rootDir>/src"],
+    "moduleNameMapper": {
+        "^(?!.*discord\\.js$)(.*)\\.js$": "$1"
+    },
+    "transform": {
+        "^.+\\.ts$": "ts-jest"
+    }
+}

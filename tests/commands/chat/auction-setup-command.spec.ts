@@ -4,7 +4,7 @@
 
 import { AuctionSetupCommand } from '../../../src/commands/chat/auction-setup-command';
 import { ChatInputCommandInteraction } from 'discord.js';
-import { DatabaseUtils } from '../../../src/utils/index.js';
+import { DatabaseUtils } from '../../../src/utils/index';
 import { EventData } from '../../../src/models/internal-models';
 
 describe('AuctionSetupCommand', () => {
