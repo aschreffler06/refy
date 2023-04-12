@@ -1,12 +1,18 @@
 {
-    "preset": "ts-jest",
     "testEnvironment": "node",
     "rootDir": ".",
     "modulePaths": ["<rootDir>/src"],
+    "verbose": true,
     "moduleNameMapper": {
         "^(?!.*discord\\.js$)(.*)\\.js$": "$1"
     },
     "transform": {
-        "^.+\\.ts$": "ts-jest"
-    }
+        "^.+\\.ts$": [
+            "ts-jest",
+            {
+                "tsconfig": "tsconfig.test.json"
+            }
+        ]
+    },
+    "testPathIgnorePatterns": ["/node_modules/", "/dist/"]
 }
