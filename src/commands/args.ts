@@ -48,4 +48,10 @@ export class Args {
             },
         ],
     };
+    public static readonly NAME: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.name', Language.Default),
+        description: Lang.getRef('argDescs.name', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+    };
 }

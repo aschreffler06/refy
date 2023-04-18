@@ -30,11 +30,6 @@ export class AuctionSetupCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
-        // prompt to tell them what to do
-        // modal to get name of auction and the player discord ids. comma separated.
-        // get discord ids from discord names
-        // check name to make sure not in db.
-        // check to see that player discord ids are in the server
         const auctionCreatePrompt = await InteractionUtils.send(
             intr,
             {
@@ -85,6 +80,7 @@ export class AuctionSetupCommand implements Command {
                                 placeholder: 'Input bidders discord tags separated by commas',
                                 style: TextInputStyle.Paragraph,
                                 required: true,
+                                minLength: 1,
                             },
                         ],
                     },
@@ -105,10 +101,9 @@ export class AuctionSetupCommand implements Command {
                 try {
                     biddersList = this.cleanBidders(bidders.value, modalSubmitInteraction);
                 } catch (error) {
-                    await InteractionUtils.send(modalSubmitInteraction, error, true);
+                    await InteractionUtils.send(modalSubmitInteraction, error.toString(), true);
                     return;
                 }
-
                 return {
                     intr: modalSubmitInteraction,
                     value: {
@@ -123,19 +118,24 @@ export class AuctionSetupCommand implements Command {
             return;
         }
 
-        await InteractionUtils.send(
-            auctionCreateResult.intr,
-            `bidders: ${auctionCreateResult.value.bidders}`,
-            true
-        );
+        if (await Auction.exists({ name: auctionCreateResult.value.name })) {
+            await InteractionUtils.send(
+                auctionCreateResult.intr,
+                `Auction with name ${auctionCreateResult.value.name} already exists. Please choose a different name.`,
+                true
+            );
+            return;
+        }
 
-        //check to see if name is in db already
         const auction = new Auction({
+            guild_id: auctionCreateResult.intr.guildId,
             name: auctionCreateResult.value.name,
             bidders: auctionCreateResult.value.bidders,
         });
 
         await auction.save();
+
+        await InteractionUtils.send(auctionCreateResult.intr, 'Auction created!', true);
     }
 
     private cleanBidders(
@@ -143,7 +143,7 @@ export class AuctionSetupCommand implements Command {
         modalSubmitInteraction: ModalSubmitInteraction<CacheType>
     ): string[] {
         const biddersList = bidders.split(',');
-        biddersList.forEach(async function (name: string) {
+        biddersList.forEach(function (name: string) {
             if (!SanitizerUtils.sanitizeDiscordId(name)) {
                 throw new InvalidDiscordTagError(name);
             }
