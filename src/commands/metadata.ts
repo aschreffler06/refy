@@ -83,13 +83,6 @@ export const ChatCommandMetadata: {
             },
         ],
     },
-    AUCTION_BID: {
-        type: ApplicationCommandType.ChatInput,
-        name: Lang.getRef('chatCommands.auctionBid', Language.Default),
-        description: Lang.getRef('commandDescs.auctionBid', Language.Default),
-        dm_permission: true,
-        default_member_permissions: undefined,
-    },
     AUCTION_SALE: {
         type: ApplicationCommandType.ChatInput,
         name: Lang.getRef('chatCommands.auctionSale', Language.Default),
@@ -98,6 +91,12 @@ export const ChatCommandMetadata: {
         default_member_permissions: PermissionsBitField.resolve([
             PermissionFlagsBits.ManageGuild,
         ]).toString(),
+        options: [
+            {
+                ...Args.NAME,
+                required: true,
+            },
+        ],
     },
     CREATE_TICKET: {
         type: ApplicationCommandType.ChatInput,

@@ -1,7 +1,9 @@
 {
     "bot": {
         "name": "refy",
-        "author": "corea"
+        "author": "corea",
+        "icon": "https://imgur.com/rGtmKq8.jpg",
+        "osu": "https://osu.ppy.sh/users/5427223"
     },
     "emojis": {
         "yes": "✅",

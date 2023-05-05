@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Auction } from '../../database/index.js';
@@ -16,20 +16,50 @@ export class AuctionStartCommand implements Command {
 
     public async execute(intr: ChatInputCommandInteraction, _data: EventData): Promise<void> {
         const args = {
-            option: intr.options.getString(Lang.getRef('arguments.name', Language.Default)),
+            name: intr.options.getString(Lang.getRef('arguments.name', Language.Default)),
         };
 
-        const auction = await Auction.findOne({ name: args.option });
+        const auction = await Auction.findOne({ name: args.name, guild_id: intr.guildId });
         if (auction === null) {
-            await InteractionUtils.send(intr, `Auction ${args.option} does not exist`);
+            await InteractionUtils.send(
+                intr,
+                `Auction ${args.name} does not exist for this server`
+            );
             return;
         }
 
-        const bidders = auction.bidders.map(bidder => [bidder, '1500']);
+        const bidders = auction.bidders;
+        // reset the auction in case it was ran before
+        bidders.forEach(bidder => {
+            bidder.cash = auction.starting_cash;
+            bidder.items = [];
+        });
         console.log(bidders);
 
-        //setup message collector that gets messages from the bot. these messages are sent from the bid command and sale command. running timer etc. etc.
+        const auctionName = auction.name;
 
-        await InteractionUtils.send(intr, args.option);
+        let biddersString = '';
+        for (const bidder of bidders) {
+            biddersString += `<@${bidder._id}>\n`;
+        }
+        biddersString = biddersString.trim();
+
+        const startEmbed = new EmbedBuilder()
+            .setTitle(`Auction '${auctionName}' will begin shortly!`)
+            .setDescription(
+                `Bidding minimum is $25, maximum is $600, and you can only bid in values divisible by $25.`
+            )
+            .setColor(0xff0000)
+            .setAuthor({
+                name: Lang.getCom('bot.author'),
+                iconURL: Lang.getCom('bot.icon'),
+                url: Lang.getCom('bot.osu'),
+            })
+            .addFields(
+                { name: 'Starting Cash', value: auction.starting_cash.toString() },
+                { name: 'Bidders', value: biddersString }
+            );
+
+        InteractionUtils.send(intr, startEmbed);
     }
 }

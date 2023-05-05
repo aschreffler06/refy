@@ -30,6 +30,13 @@ export class AuctionSetupCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
+        if ((await Auction.find({ guild_id: intr.guildId }).count()) > 0) {
+            await InteractionUtils.send(
+                intr,
+                `I'm sorry but at the current moment, only 1 auction is supported per server. Please end the current auction before creating a new one (/auction-delete).`
+            );
+            return;
+        }
         const auctionCreatePrompt = await InteractionUtils.send(
             intr,
             {
@@ -75,6 +82,19 @@ export class AuctionSetupCommand implements Command {
                         components: [
                             {
                                 type: ComponentType.TextInput,
+                                customId: 'startingCash',
+                                label: 'Starting Cash',
+                                placeholder: 'Input starting cash for each bidder',
+                                style: TextInputStyle.Short,
+                                required: true,
+                            },
+                        ],
+                    },
+                    {
+                        type: ComponentType.ActionRow,
+                        components: [
+                            {
+                                type: ComponentType.TextInput,
                                 customId: 'bidders',
                                 label: 'Bidders',
                                 placeholder: 'Input bidders discord tags separated by commas',
@@ -89,17 +109,28 @@ export class AuctionSetupCommand implements Command {
 
             async modalSubmitInteraction => {
                 const auctionName = modalSubmitInteraction.components[0].components[0];
-                const bidders = modalSubmitInteraction.components[1].components[0];
+                const startingCash = modalSubmitInteraction.components[1].components[0];
+                const bidders = modalSubmitInteraction.components[2].components[0];
                 if (
                     auctionName.type !== ComponentType.TextInput ||
+                    startingCash.type !== ComponentType.TextInput ||
                     bidders.type !== ComponentType.TextInput
                 ) {
                     return;
                 }
 
+                if (Number(startingCash.value) % 25 !== 0) {
+                    await InteractionUtils.send(
+                        modalSubmitInteraction,
+                        'Starting cash must be a multiple of 25. Please rerun the command and choose a different starting cash.',
+                        true
+                    );
+                    return;
+                }
+
                 let biddersList;
                 try {
-                    biddersList = this.cleanBidders(bidders.value, modalSubmitInteraction);
+                    biddersList = await cleanBidders(bidders.value, modalSubmitInteraction);
                 } catch (error) {
                     await InteractionUtils.send(modalSubmitInteraction, error.toString(), true);
                     return;
@@ -108,6 +139,7 @@ export class AuctionSetupCommand implements Command {
                     intr: modalSubmitInteraction,
                     value: {
                         name: auctionName.value,
+                        startingCash: startingCash.value,
                         bidders: biddersList,
                     },
                 };
@@ -121,38 +153,46 @@ export class AuctionSetupCommand implements Command {
         if (await Auction.exists({ name: auctionCreateResult.value.name })) {
             await InteractionUtils.send(
                 auctionCreateResult.intr,
-                `Auction with name ${auctionCreateResult.value.name} already exists. Please choose a different name.`,
+                `Auction with name ${auctionCreateResult.value.name} already exists. Please rerun the command and choose a different name.`,
                 true
             );
             return;
         }
 
+        const bidders = auctionCreateResult.value.bidders.map(bidder => {
+            return {
+                _id: bidder,
+                cash: auctionCreateResult.value.startingCash,
+                items: [],
+            };
+        });
+
         const auction = new Auction({
             guild_id: auctionCreateResult.intr.guildId,
             name: auctionCreateResult.value.name,
-            bidders: auctionCreateResult.value.bidders,
+            starting_cash: auctionCreateResult.value.startingCash,
+            bidders: bidders,
         });
 
         await auction.save();
 
         await InteractionUtils.send(auctionCreateResult.intr, 'Auction created!', true);
     }
+}
 
-    private cleanBidders(
-        bidders: string,
-        modalSubmitInteraction: ModalSubmitInteraction<CacheType>
-    ): string[] {
-        const biddersList = bidders.split(',');
-        biddersList.forEach(function (name: string) {
-            if (!SanitizerUtils.sanitizeDiscordId(name)) {
-                throw new InvalidDiscordTagError(name);
-            }
-
-            const user = modalSubmitInteraction.client.users.cache.find(user => user.tag === name);
-            if (user === undefined) {
-                throw new UserNotInGuildError(name);
-            }
-        });
-        return biddersList;
+async function cleanBidders(
+    bidders: string,
+    modalSubmitInteraction: ModalSubmitInteraction<CacheType>
+): Promise<string[]> {
+    let biddersList = bidders.split(',');
+    biddersList = biddersList.map(bidder => bidder.trim());
+    const guild = await modalSubmitInteraction.client.guilds.fetch(modalSubmitInteraction.guildId);
+    for (const bidderId of biddersList) {
+        try {
+            await guild.members.fetch(bidderId);
+        } catch (error) {
+            throw new UserNotInGuildError(bidderId);
+        }
     }
+    return biddersList;
 }

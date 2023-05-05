@@ -4,7 +4,6 @@ import { createRequire } from 'node:module';
 
 import { Button } from './buttons/index.js';
 import {
-    AuctionBidCommand,
     AuctionDisplayCommand,
     AuctionSaleCommand,
     AuctionSetupCommand,
@@ -76,7 +75,6 @@ async function start(): Promise<void> {
         new AuctionSetupCommand(),
         new AuctionDisplayCommand(),
         new AuctionStartCommand(),
-        new AuctionBidCommand(),
         new AuctionSaleCommand(),
         new CreateTicketCommand(),
 
