@@ -187,10 +187,21 @@
         "bot": {
             "description": "{{REF:links.templateEmbed}} helps give developers a starting point for new Discord bots, so that much of the initial setup can be avoided and developers can instead focus on meaningful bot features."
         },
+        "button": {
+            "continue": "Continue",
+            "cancel": "Cancel",
+            "create": "Create"
+        },
         "chatCommands": {
             "help": "help",
             "info": "info",
-            "test": "test"
+            "test": "test",
+            "auctionSetup": "auction-setup",
+            "auctionDisplay": "auction-display",
+            "auctionStart": "auction-start",
+            "auctionBid": "auction-bid",
+            "auctionSale": "auction-sale",
+            "createTicket": "create-ticket"
         },
         "userCommands": {
             "viewDateJoined": "View Date Joined"
@@ -199,16 +210,24 @@
             "viewDateSent": "View Date Sent"
         },
         "arguments": {
-            "option": "option"
+            "option": "option",
+            "name": "name"
         },
         "commandDescs": {
             "help": "Find help or contact support.",
             "info": "View bot info.",
-            "test": "Run the test command."
+            "test": "Run the test command.",
+            "auctionSetup": "Setup an auction.",
+            "auctionDisplay": "Display the auctions for this server.",
+            "auctionStart": "Start an auction. Type 'stop-auction' to stop the auction.",
+            "auctionBid": "Bid on the current item",
+            "auctionSale": "Put an item up for sale.",
+            "createTicket": "Create a ticket for bot support."
         },
         "argDescs": {
             "helpOption": "Option.",
-            "infoOption": "Option."
+            "infoOption": "Option.",
+            "name": "Name."
         },
         "fields": {
             "commands": "Commands",
@@ -269,6 +288,9 @@
             "about": "About",
             "translate": "Translate",
             "dev": "Dev"
+        },
+        "responses": {
+            "commandCancelled": "Command cancelled."
         },
         "yesNo": {
             "yes": "Yes",

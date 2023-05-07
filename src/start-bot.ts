@@ -3,7 +3,16 @@ import { Options, Partials } from 'discord.js';
 import { createRequire } from 'node:module';
 
 import { Button } from './buttons/index.js';
-import { HelpCommand, InfoCommand, TestCommand } from './commands/chat/index.js';
+import {
+    AuctionDisplayCommand,
+    AuctionSaleCommand,
+    AuctionSetupCommand,
+    AuctionStartCommand,
+    CreateTicketCommand,
+    HelpCommand,
+    InfoCommand,
+    TestCommand,
+} from './commands/chat/index.js';
 import {
     ChatCommandMetadata,
     Command,
@@ -32,6 +41,7 @@ import {
     Logger,
 } from './services/index.js';
 import { Trigger } from './triggers/index.js';
+import { DatabaseUtils } from './utils/index.js';
 
 const require = createRequire(import.meta.url);
 let Config = require('../config/config.json');
@@ -40,6 +50,9 @@ let Logs = require('../lang/logs.json');
 async function start(): Promise<void> {
     // Services
     let eventDataService = new EventDataService();
+
+    // Database
+    await DatabaseUtils.connectDB();
 
     // Client
     let client = new CustomClient({
@@ -59,6 +72,11 @@ async function start(): Promise<void> {
         new HelpCommand(),
         new InfoCommand(),
         new TestCommand(),
+        new AuctionSetupCommand(),
+        new AuctionDisplayCommand(),
+        new AuctionStartCommand(),
+        new AuctionSaleCommand(),
+        new CreateTicketCommand(),
 
         // Message Context Commands
         new ViewDateSent(),

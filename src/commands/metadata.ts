@@ -1,12 +1,14 @@
 import {
     ApplicationCommandType,
+    PermissionFlagsBits,
+    PermissionsBitField,
     RESTPostAPIChatInputApplicationCommandsJSONBody,
     RESTPostAPIContextMenuApplicationCommandsJSONBody,
 } from 'discord.js';
 
+import { Args } from './index.js';
 import { Language } from '../models/enum-helpers/index.js';
 import { Lang } from '../services/index.js';
-import { Args } from './index.js';
 
 export const ChatCommandMetadata: {
     [command: string]: RESTPostAPIChatInputApplicationCommandsJSONBody;
@@ -47,6 +49,59 @@ export const ChatCommandMetadata: {
         name_localizations: Lang.getRefLocalizationMap('chatCommands.test'),
         description: Lang.getRef('commandDescs.test', Language.Default),
         description_localizations: Lang.getRefLocalizationMap('commandDescs.test'),
+        dm_permission: true,
+        default_member_permissions: undefined,
+    },
+    AUCTION_SETUP: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.auctionSetup', Language.Default),
+        description: Lang.getRef('commandDescs.auctionSetup', Language.Default),
+        dm_permission: true,
+        default_member_permissions: PermissionsBitField.resolve([
+            PermissionFlagsBits.ManageGuild,
+        ]).toString(),
+    },
+    AUCTION_DISPLAY: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.auctionDisplay', Language.Default),
+        description: Lang.getRef('commandDescs.auctionDisplay', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+    },
+    AUCTION_START: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.auctionStart', Language.Default),
+        description: Lang.getRef('commandDescs.auctionStart', Language.Default),
+        dm_permission: true,
+        default_member_permissions: PermissionsBitField.resolve([
+            PermissionFlagsBits.ManageGuild,
+        ]).toString(),
+        options: [
+            {
+                ...Args.NAME,
+                required: true,
+            },
+        ],
+    },
+    AUCTION_SALE: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.auctionSale', Language.Default),
+        description: Lang.getRef('commandDescs.auctionSale', Language.Default),
+        dm_permission: true,
+        default_member_permissions: PermissionsBitField.resolve([
+            PermissionFlagsBits.ManageGuild,
+        ]).toString(),
+        options: [
+            {
+                ...Args.NAME,
+                required: true,
+            },
+        ],
+    },
+    CREATE_TICKET: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.createTicket', Language.Default),
+        description: Lang.getRef('commandDescs.createTicket', Language.Default),
         dm_permission: true,
         default_member_permissions: undefined,
     },
