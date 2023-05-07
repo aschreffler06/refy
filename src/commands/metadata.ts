@@ -105,6 +105,19 @@ export const ChatCommandMetadata: {
         dm_permission: true,
         default_member_permissions: undefined,
     },
+    LINK: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.link', Language.Default),
+        description: Lang.getRef('commandDescs.link', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+        options: [
+            {
+                ...Args.NAME,
+                required: true,
+            },
+        ],
+    },
 };
 
 export const MessageCommandMetadata: {

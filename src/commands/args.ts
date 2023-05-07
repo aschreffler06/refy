@@ -54,4 +54,10 @@ export class Args {
         type: ApplicationCommandOptionType.String,
         required: true,
     };
+    public static readonly ID: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.id', Language.Default),
+        description: Lang.getRef('argDescs.id', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+    };
 }

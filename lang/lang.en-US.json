@@ -201,7 +201,8 @@
             "auctionStart": "auction-start",
             "auctionBid": "auction-bid",
             "auctionSale": "auction-sale",
-            "createTicket": "create-ticket"
+            "createTicket": "create-ticket",
+            "link": "link"
         },
         "userCommands": {
             "viewDateJoined": "View Date Joined"
@@ -211,7 +212,8 @@
         },
         "arguments": {
             "option": "option",
-            "name": "name"
+            "name": "name",
+            "id": "id"
         },
         "commandDescs": {
             "help": "Find help or contact support.",
@@ -222,12 +224,14 @@
             "auctionStart": "Start an auction. Type 'stop-auction' to stop the auction.",
             "auctionBid": "Bid on the current item",
             "auctionSale": "Put an item up for sale.",
-            "createTicket": "Create a ticket for bot support."
+            "createTicket": "Create a ticket for bot support.",
+            "link": "Link your osu account"
         },
         "argDescs": {
             "helpOption": "Option.",
             "infoOption": "Option.",
-            "name": "Name."
+            "name": "Name",
+            "id": "ID"
         },
         "fields": {
             "commands": "Commands",

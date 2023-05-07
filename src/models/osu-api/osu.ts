@@ -1,4 +1,9 @@
 export interface GetAuthTokenResponse {
     token: string;
-    expiresIn: number;
+    expirationTime: number;
+}
+
+export class GetOsuUserRequest {
+    id: number;
+    username: string;
 }

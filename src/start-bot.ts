@@ -11,6 +11,7 @@ import {
     CreateTicketCommand,
     HelpCommand,
     InfoCommand,
+    LinkCommand,
     TestCommand,
 } from './commands/chat/index.js';
 import {
@@ -21,7 +22,7 @@ import {
 } from './commands/index.js';
 import { ViewDateSent } from './commands/message/index.js';
 import { ViewDateJoined } from './commands/user/index.js';
-import { OsuController } from './controllers/index.js';
+// import { OsuController } from './controllers/index.js';
 import {
     ButtonHandler,
     CommandHandler,
@@ -33,7 +34,7 @@ import {
 } from './events/index.js';
 import { CustomClient } from './extensions/index.js';
 import { Job } from './jobs/index.js';
-import { Api } from './models/api.js';
+// import { Api } from './models/api.js';
 import { Bot } from './models/bot.js';
 import { Reaction } from './reactions/index.js';
 import {
@@ -74,11 +75,13 @@ async function start(): Promise<void> {
         new HelpCommand(),
         new InfoCommand(),
         new TestCommand(),
+
         new AuctionSetupCommand(),
         new AuctionDisplayCommand(),
         new AuctionStartCommand(),
         new AuctionSaleCommand(),
         new CreateTicketCommand(),
+        new LinkCommand(),
 
         // Message Context Commands
         new ViewDateSent(),
@@ -151,9 +154,9 @@ async function start(): Promise<void> {
     }
 
     //test api stuff
-    let osuController = new OsuController();
-    let api = new Api([osuController]);
-    await api.start();
+    // let osuController = new OsuController();
+    // let api = new Api([osuController]);
+    // await api.start();
 
     await bot.start();
 }

@@ -1,13 +1,14 @@
 import { model, Schema } from 'mongoose';
 
-type IPlayer = {
+interface IPlayer {
     _id: number;
     discord: string;
     rank: number;
     badges: number;
     timezone: number;
     country: string;
-};
+    avatar: string;
+}
 
 const playerSchema = new Schema<IPlayer>({
     _id: { type: Number, required: true },
