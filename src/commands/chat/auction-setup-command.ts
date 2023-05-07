@@ -16,11 +16,11 @@ import { CollectorUtils } from 'discord.js-collector-utils';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Auction } from '../../database/index.js';
-import { InvalidDiscordTagError, UserNotInGuildError } from '../../error/index.js';
+import { UserNotInGuildError } from '../../error/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
-import { InteractionUtils, SanitizerUtils } from '../../utils/index.js';
+import { InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 
 export class AuctionSetupCommand implements Command {
