@@ -21,6 +21,7 @@ import {
 } from './commands/index.js';
 import { ViewDateSent } from './commands/message/index.js';
 import { ViewDateJoined } from './commands/user/index.js';
+import { OsuController } from './controllers/index.js';
 import {
     ButtonHandler,
     CommandHandler,
@@ -32,6 +33,7 @@ import {
 } from './events/index.js';
 import { CustomClient } from './extensions/index.js';
 import { Job } from './jobs/index.js';
+import { Api } from './models/api.js';
 import { Bot } from './models/bot.js';
 import { Reaction } from './reactions/index.js';
 import {
@@ -147,6 +149,11 @@ async function start(): Promise<void> {
         await new Promise(resolve => setTimeout(resolve, 1000));
         process.exit();
     }
+
+    //test api stuff
+    let osuController = new OsuController();
+    let api = new Api([osuController]);
+    await api.start();
 
     await bot.start();
 }
