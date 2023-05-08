@@ -2,6 +2,7 @@ import { model, Schema } from 'mongoose';
 
 interface IPlayer {
     _id: number;
+    username: string;
     discord: string;
     rank: number;
     badges: number;
@@ -14,6 +15,7 @@ interface IPlayer {
 
 const playerSchema = new Schema<IPlayer>({
     _id: { type: Number, required: true },
+    username: { type: String, required: true },
     discord: { type: String, required: true },
     rank: { type: Number, required: true },
     badges: { type: Number, required: true },

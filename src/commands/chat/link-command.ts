@@ -33,6 +33,7 @@ export class LinkCommand implements Command {
         if (!user) {
             const player = new Player({
                 _id: userInfo.id,
+                username: userInfo.username,
                 discord: discordId,
                 rank: userInfo.rank,
                 badges: userInfo.badges,
@@ -48,6 +49,8 @@ export class LinkCommand implements Command {
                 ephemeral: true,
             });
         } else {
+            user._id = userInfo.id;
+            user.username = userInfo.username;
             user.discord = discordId;
             user.rank = userInfo.rank;
             user.badges = userInfo.badges;
