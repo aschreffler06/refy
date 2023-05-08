@@ -16,6 +16,7 @@ export class LinkCommand implements Command {
     public deferType = CommandDeferType.HIDDEN;
     public requireClientPerms: PermissionsString[] = [];
 
+    //TODO: make work with old names. api user data should send it back to us
     public async execute(intr: ChatInputCommandInteraction, _data: EventData): Promise<void> {
         const args = {
             name: intr.options.getString(Lang.getRef('arguments.name', Language.Default)),
