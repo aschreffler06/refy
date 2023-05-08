@@ -3,6 +3,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { OsuController } from '../../controllers/index.js';
 import { OsuUserInfo } from '../../models/data-objects/index.js';
+import { Player } from '../../models/database/player.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
@@ -12,7 +13,7 @@ import { Command, CommandDeferType } from '../index.js';
 export class LinkCommand implements Command {
     public names = [Lang.getRef('chatCommands.link', Language.Default)];
     public cooldown = new RateLimiter(1, 5000);
-    public deferType = CommandDeferType.PUBLIC;
+    public deferType = CommandDeferType.HIDDEN;
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, _data: EventData): Promise<void> {
@@ -21,68 +22,44 @@ export class LinkCommand implements Command {
         };
 
         const osuController = new OsuController();
-        const osuUser: OsuUserInfo = await osuController.getUser({
+        const userInfo: OsuUserInfo = await osuController.getUser({
             username: args.name,
         });
 
-        console.log(osuUser);
+        const discordId = intr.user.id;
 
-        await InteractionUtils.send(intr, `Name: ${args.name}`);
+        const user = await Player.findById(userInfo.id).exec();
+        if (!user) {
+            const player = new Player({
+                _id: userInfo.id,
+                discord: discordId,
+                rank: userInfo.rank,
+                badges: userInfo.badges,
+                accuracy: userInfo.accuracy,
+                level: userInfo.level,
+                playCount: userInfo.playCount,
+                playTime: userInfo.playTime,
+                avatar: userInfo.avatar,
+            });
+            await player.save();
+            await InteractionUtils.send(intr, {
+                content: `You have successfully linked your account!`,
+                ephemeral: true,
+            });
+        } else {
+            user.discord = discordId;
+            user.rank = userInfo.rank;
+            user.badges = userInfo.badges;
+            user.accuracy = userInfo.accuracy;
+            user.level = userInfo.level;
+            user.playCount = userInfo.playCount;
+            user.playTime = userInfo.playTime;
+            user.avatar = userInfo.avatar;
+            await user.save();
+            await InteractionUtils.send(intr, {
+                content: `You have successfully relinked your account!`,
+                ephemeral: true,
+            });
+        }
     }
 }
-
-// module.exports = {
-//     data: new SlashCommandBuilder()
-//         .setName('link')
-//         .setDescription('Link your osu account with your name')
-//         .addStringOption(option =>
-//             option.setName('name').setDescription('Your osu! name').setRequired(true)
-//         ),
-
-//     async execute(interaction: ChatInputCommandInteraction) {
-//         const osuController = new OsuController();
-//         const osuName = interaction.options.getString('name');
-//         // name is required in the command definition so we don't need to check for it but typescript is dumb
-//         if (!osuName) {
-//             return;
-//         }
-//         const osuUser = await osuController.getUser({ username: osuName });
-//         if (!(osuUser.id == -1)) {
-//             // Check if they are already in the DB. No multiaccounting so we assume that they are relinking to a new discord and will only cover that specific case
-//             // This will also force an update to their rank and badge count
-//             const user = await Player.findById(osuUser.id).exec();
-//             // Put in DB
-//             if (!user) {
-//                 const player = new Player({
-//                     _id: osuUser.id,
-//                     discord: interaction.user.tag,
-//                     rank: osuUser.rank,
-//                     badges: osuUser.badges,
-//                 });
-//                 await player.save();
-//                 await interaction.reply({
-//                     content: 'You have successfully linked your account!',
-//                     ephemeral: true,
-//                 });
-//                 // Update DB
-//             } else {
-//                 user.updateOne({
-//                     discord: interaction.user.tag,
-//                     rank: osuUser.rank,
-//                     badges: osuUser.badges,
-//                 }).exec();
-//                 await user.save();
-//                 await interaction.reply({
-//                     content: 'You have successfully relinked your account!',
-//                     ephemeral: true,
-//                 });
-//             }
-//         } else {
-//             await interaction.reply({
-//                 content: 'There was an error. Please check that your name is inputted correctly.',
-//                 ephemeral: true,
-//             });
-//         }
-//         return;
-//     },
-// };

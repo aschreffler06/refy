@@ -80,7 +80,12 @@ export class OsuController {
                 user.data.id,
                 user.data.username,
                 user.data.statistics.global_rank,
-                user.data.badges.length
+                user.data.badges.length,
+                Math.round(user.data.statistics.hit_accuracy * 100) / 100,
+                user.data.statistics.level.current,
+                user.data.statistics.play_count,
+                Math.round((user.data.statistics.play_time / 3600) * 100) / 100,
+                user.data.avatar_url
             );
         } catch (err) {
             console.log('Error getting user');
