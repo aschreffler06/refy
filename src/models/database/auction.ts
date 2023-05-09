@@ -25,6 +25,7 @@ interface IAuction {
 type AuctionDocumentProps = {
     bidders: Types.DocumentArray<IBidder>;
     getCash: (id: string) => number;
+    getAllCash: () => [string, number][];
     getItems: (id: string) => string[];
 };
 
@@ -44,6 +45,13 @@ auctionSchema.method('getCash', function getCash(this: IAuction, id: string): nu
     } else {
         return 0;
     }
+});
+
+/**
+ * Returns an array of tuples of the form [id, cash]
+ */
+auctionSchema.method('getAllCash', function getAllCash(this: IAuction): [string, number][] {
+    return this.bidders.map(bidder => [bidder._id, bidder.cash]);
 });
 
 auctionSchema.method('getItems', function getItems(this: IAuction, id: string): string[] {

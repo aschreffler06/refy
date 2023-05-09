@@ -15,11 +15,26 @@ export class AuctionShowCashCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, _data: EventData): Promise<void> {
+        const args = {
+            name: intr.options.getBoolean(Lang.getRef('arguments.showAll', Language.Default)),
+        };
         const auction = await Auction.findOne({ guild_id: intr.guildId }).exec();
-        const cash = auction.getCash(intr.user.id);
-        const cashEmbed = new EmbedBuilder()
-            .setTitle(`Viewing ${intr.user.username}'s cash`)
-            .addFields({ name: 'Cash', value: cash.toString() });
+        let cashEmbed: EmbedBuilder;
+        if (args.name) {
+            const cashes = auction.getAllCash();
+            let cashString = '';
+            for (const user of cashes) {
+                cashString += `<@${user[0]}>: ${user[1]}\n`;
+            }
+            cashEmbed = new EmbedBuilder()
+                .setTitle(`Viewing All User's Cash`)
+                .addFields({ name: 'Cash', value: cashString });
+        } else {
+            const cash = auction.getCash(intr.user.id);
+            cashEmbed = new EmbedBuilder()
+                .setTitle(`Viewing ${intr.user.username}'s Cash`)
+                .addFields({ name: 'Cash', value: cash.toString() });
+        }
 
         await InteractionUtils.send(intr, cashEmbed);
     }

@@ -60,4 +60,10 @@ export class Args {
         type: ApplicationCommandOptionType.String,
         required: true,
     };
+    public static readonly SHOW_ALL: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.showAll', Language.Default),
+        description: Lang.getRef('argDescs.showAll', Language.Default),
+        type: ApplicationCommandOptionType.Boolean,
+        required: false,
+    };
 }

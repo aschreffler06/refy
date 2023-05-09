@@ -66,6 +66,11 @@ export const ChatCommandMetadata: {
         name: Lang.getRef('chatCommands.auctionShowCash', Language.Default),
         description: Lang.getRef('commandDescs.auctionShowCash', Language.Default),
         dm_permission: true,
+        options: [
+            {
+                ...Args.SHOW_ALL,
+            },
+        ],
     },
     AUCTION_SHOW_ITEMS: {
         type: ApplicationCommandType.ChatInput,

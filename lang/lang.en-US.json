@@ -219,7 +219,8 @@
         "arguments": {
             "option": "option",
             "name": "name",
-            "id": "id"
+            "id": "id",
+            "showAll": "show-all"
         },
         "commandDescs": {
             "help": "Find help or contact support.",
@@ -243,7 +244,8 @@
             "helpOption": "Option.",
             "infoOption": "Option.",
             "name": "Name",
-            "id": "ID"
+            "id": "ID",
+            "showAll": "Show all"
         },
         "fields": {
             "commands": "Commands",
