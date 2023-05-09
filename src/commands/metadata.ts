@@ -61,6 +61,18 @@ export const ChatCommandMetadata: {
             PermissionFlagsBits.ManageGuild,
         ]).toString(),
     },
+    AUCTION_SHOW_CASH: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.auctionShowCash', Language.Default),
+        description: Lang.getRef('commandDescs.auctionShowCash', Language.Default),
+        dm_permission: true,
+    },
+    AUCTION_SHOW_ITEMS: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.auctionShowItems', Language.Default),
+        description: Lang.getRef('commandDescs.auctionShowItems', Language.Default),
+        dm_permission: true,
+    },
     AUCTION_DISPLAY: {
         type: ApplicationCommandType.ChatInput,
         name: Lang.getRef('chatCommands.auctionDisplay', Language.Default),
@@ -117,6 +129,13 @@ export const ChatCommandMetadata: {
                 required: true,
             },
         ],
+    },
+    PP_SUBMIT_PLAY: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppSubmitPlay', Language.Default),
+        description: Lang.getRef('commandDescs.ppSubmitPlay', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
     },
 };
 

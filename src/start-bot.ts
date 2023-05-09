@@ -7,11 +7,14 @@ import {
     AuctionDisplayCommand,
     AuctionSaleCommand,
     AuctionSetupCommand,
+    AuctionShowCashCommand,
+    AuctionShowItemsCommand,
     AuctionStartCommand,
     CreateTicketCommand,
     HelpCommand,
     InfoCommand,
     LinkCommand,
+    PpSubmitPlayCommand,
     TestCommand,
 } from './commands/chat/index.js';
 import {
@@ -76,12 +79,15 @@ async function start(): Promise<void> {
         new InfoCommand(),
         new TestCommand(),
 
-        new AuctionSetupCommand(),
         new AuctionDisplayCommand(),
-        new AuctionStartCommand(),
         new AuctionSaleCommand(),
+        new AuctionSetupCommand(),
+        new AuctionShowCashCommand(),
+        new AuctionShowItemsCommand(),
+        new AuctionStartCommand(),
         new CreateTicketCommand(),
         new LinkCommand(),
+        new PpSubmitPlayCommand(),
 
         // Message Context Commands
         new ViewDateSent(),

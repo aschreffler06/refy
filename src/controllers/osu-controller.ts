@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 
 import { GetUserParams } from '../enums/index.js';
 import { OsuUserInfo } from '../models/data-objects/osu-user-info.js';
-import { Token } from '../models/database/index.js';
+import { Player, Token } from '../models/database/index.js';
 // import { Request, Response, Router } from 'express';
 // import router from 'express-promise-router';
 
@@ -40,7 +40,7 @@ export class OsuController {
         };
 
         try {
-            const token = await Token.findOne({ _id: 1 });
+            const token = await Token.findOne({ _id: 1 }).exec();
             if (token.isExpired() || !token || forceNew) {
                 const response = await axios.post('https://osu.ppy.sh/oauth/token', bodyParameters);
                 const newToken = new Token({
@@ -49,7 +49,7 @@ export class OsuController {
                     expirationTime:
                         Number(response.data.expires_in) + Math.trunc(Date.now() / 1000),
                 });
-                await Token.findOneAndUpdate({ _id: 1 }, newToken, { upsert: true });
+                await Token.findOneAndUpdate({ _id: 1 }, newToken, { upsert: true }).exec();
                 return newToken.token;
             } else {
                 return token.token;
@@ -90,6 +90,17 @@ export class OsuController {
         } catch (err) {
             console.log('Error getting user');
         }
+    }
+
+    public async getRecentPlay(discordId: string): Promise<string> {
+        // const token = await this.getAuthToken();
+        // const config = {
+        //     headers: { Authorization: `Bearer ${token}` },
+        // };
+        const osu = await Player.findOne({ discord: discordId }).exec();
+        const osuId = osu._id;
+        console.log(osuId);
+        return 'test';
     }
 
     // private async getAuthToken(req: Request, res: Response): Promise<void> {

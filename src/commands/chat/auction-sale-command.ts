@@ -55,7 +55,6 @@ export class AuctionSaleCommand implements Command {
         bidCollector.on('collect', async m => {
             switch (true) {
                 case /^bid [$]\d{1,3}$/.test(m.content): {
-                    console.log(`user ${m.author.tag} bid ${m.content.split('$')[1]}`);
                     bidCollector.resetTimer({ time: 10000 });
                     const bid = parseInt(m.content.split('$')[1]);
                     if (!isBidValid(bid)) {
@@ -88,7 +87,7 @@ export class AuctionSaleCommand implements Command {
                     `Bidding ended! <@${highestBidder}> won with a bid of $${highestBid}!`
                 );
                 //TODO: for now we assume that only one auction is available per server
-                const auction = await Auction.findOne({ guild_id: intr.guildId });
+                const auction = await Auction.findOne({ guild_id: intr.guildId }).exec();
                 const bidders = auction.bidders;
                 const winner = bidders.find(bidder => bidder._id === highestBidder);
                 winner.cash -= highestBid;
