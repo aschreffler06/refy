@@ -220,6 +220,7 @@
             "option": "option",
             "name": "name",
             "id": "id",
+            "recent": "recent",
             "showAll": "show-all"
         },
         "commandDescs": {
@@ -245,6 +246,7 @@
             "infoOption": "Option.",
             "name": "Name",
             "id": "ID",
+            "recent": "Recent Number",
             "showAll": "Show all"
         },
         "fields": {

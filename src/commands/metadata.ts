@@ -141,6 +141,12 @@ export const ChatCommandMetadata: {
         description: Lang.getRef('commandDescs.ppSubmitPlay', Language.Default),
         dm_permission: true,
         default_member_permissions: undefined,
+        options: [
+            {
+                ...Args.RECENT,
+                required: false,
+            },
+        ],
     },
 };
 

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { createRequire } from 'node:module';
 
 import { GetUserParams } from '../enums/index.js';
+import { OsuScore } from '../models/data-objects/osu-score.js';
 import { OsuUserInfo } from '../models/data-objects/osu-user-info.js';
 import { Player, Token } from '../models/database/index.js';
 // import { Request, Response, Router } from 'express';
@@ -92,15 +93,42 @@ export class OsuController {
         }
     }
 
-    public async getRecentPlay(discordId: string): Promise<string> {
-        // const token = await this.getAuthToken();
-        // const config = {
-        //     headers: { Authorization: `Bearer ${token}` },
-        // };
+    /**
+     * Does not include fails
+     * @param discordId
+     * @returns
+     */
+    public async getRecentPlays(discordId: string): Promise<OsuScore[]> {
+        const token = await this.getAuthToken();
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
+        };
         const osu = await Player.findOne({ discord: discordId }).exec();
         const osuId = osu._id;
-        console.log(osuId);
-        return 'test';
+        const recentPlays = await axios.get(
+            `${this.osuEndpoint}/users/${osuId}/scores/recent?limit=25`,
+            config
+        );
+        const scores: OsuScore[] = [];
+        for (const play of recentPlays.data) {
+            scores.push(
+                new OsuScore(
+                    play.id,
+                    play.user.id,
+                    play.pp,
+                    play.rank,
+                    play.mods,
+                    Math.trunc(new Date(play.created_at).getTime() / 1000),
+                    play.mode,
+                    play.passed,
+                    play.beatmapset.title,
+                    play.beatmap.version,
+                    play.beatmap.url,
+                    play.beatmapset.covers.list
+                )
+            );
+        }
+        return scores;
     }
 
     // private async getAuthToken(req: Request, res: Response): Promise<void> {

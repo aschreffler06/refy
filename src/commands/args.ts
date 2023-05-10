@@ -66,4 +66,10 @@ export class Args {
         type: ApplicationCommandOptionType.Boolean,
         required: false,
     };
+    public static readonly RECENT: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.recent', Language.Default),
+        description: Lang.getRef('argDescs.recent', Language.Default),
+        type: ApplicationCommandOptionType.Number,
+        required: false,
+    };
 }
