@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
+import { OsuController } from '../../controllers/osu-controller.js';
 import { Auction } from '../../models/database/auction.js';
 import { Player } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
@@ -24,29 +25,42 @@ export class AuctionSaleCommand implements Command {
             name: intr.options.getString(Lang.getRef('arguments.name', Language.Default)),
         };
 
-        const auctioned = await Player.findOne({ username: args.name });
+        let auctioned = await Player.findOne({ username: args.name });
         if (!auctioned) {
-            await InteractionUtils.send(
-                intr,
-                `Now starting the bidding for ${args.name}! (no embed since they didn't link their account lol!)`
-            );
-        } else {
-            const playerEmbed = new EmbedBuilder()
-                .setTitle(`Now starting the bidding for ${args.name}!`)
-                .setDescription(`Here's a quick overview of their profile.`)
-                .addFields(
-                    { name: 'Rank', value: auctioned.rank.toString(), inline: true },
-                    { name: 'Accuracy', value: auctioned.accuracy.toString(), inline: true },
-                    { name: 'Badges', value: auctioned.badges.toString(), inline: true },
-                    { name: 'Level', value: auctioned.level.toString(), inline: true },
-                    { name: 'Play Count', value: auctioned.playCount.toString(), inline: true },
-                    { name: 'Play Time', value: auctioned.playTime.toString(), inline: true }
-                )
-                //TODO: add top 3 plays
-                .setThumbnail(auctioned.avatar);
-
-            await InteractionUtils.send(intr, playerEmbed);
+            // await InteractionUtils.send(
+            //     intr,
+            //     `Now starting the bidding for ${args.name}! (no embed since they didn't link their account lol!)`
+            // );
+            const osuController = new OsuController();
+            let userInfo = await osuController.getUser({ username: args.name });
+            auctioned = new Player({
+                _id: userInfo.id,
+                username: userInfo.username,
+                rank: userInfo.rank,
+                accuracy: userInfo.accuracy,
+                badges: userInfo.badges,
+                level: userInfo.level,
+                playCount: userInfo.playCount,
+                playTime: userInfo.playTime,
+                avatar: userInfo.avatar,
+            });
         }
+        const playerEmbed = new EmbedBuilder()
+            .setTitle(`Now starting the bidding for ${args.name}!`)
+            .setDescription(`Here's a quick overview of their profile.`)
+            .addFields(
+                { name: 'Rank', value: auctioned.rank.toString(), inline: true },
+                { name: 'Accuracy', value: auctioned.accuracy.toString(), inline: true },
+                { name: 'Badges', value: auctioned.badges.toString(), inline: true },
+                { name: 'Level', value: auctioned.level.toString(), inline: true },
+                { name: 'Play Count', value: auctioned.playCount.toString(), inline: true },
+                { name: 'Play Time', value: auctioned.playTime.toString(), inline: true }
+            )
+            //TODO: add top 3 plays
+            .setThumbnail(auctioned.avatar);
+
+        await InteractionUtils.send(intr, playerEmbed);
+
         const bidCollector = intr.channel.createMessageCollector({ time: 15000 });
 
         let highestBidder = null;

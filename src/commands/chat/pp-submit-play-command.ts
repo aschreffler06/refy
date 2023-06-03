@@ -14,7 +14,7 @@ import { Command, CommandDeferType } from '../index.js';
 export class PpSubmitPlayCommand implements Command {
     public names = [Lang.getRef('chatCommands.ppSubmitPlay', Language.Default)];
     public cooldown = new RateLimiter(1, 5000);
-    public deferType = CommandDeferType.PUBLIC;
+    public deferType = CommandDeferType.NONE;
     public requireClientPerms: PermissionsString[] = [];
 
     //TODO: make it so you can submit a score id as well
@@ -113,11 +113,46 @@ export class PpSubmitPlayCommand implements Command {
 
         // find which team the player submitting is on and then add this to that team's scores array
         const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
+
         if (match.team1.players.find(p => p._id === player._id)) {
+            //TODO: refactor into method but im really busy right now
+            // check the beatmap ids of all the scores and compare to the beatmap id of the score, store the one with the top pp value
+            for (let i = 0; i < match.team1.scores.length; i++) {
+                let oldScore = match.team1.scores[i];
+                if (oldScore.beatmapId === score.beatmapId) {
+                    if (oldScore.pp < score.pp) {
+                        match.team1.scores.splice(i, 1);
+                    } else {
+                        await InteractionUtils.send(intr, {
+                            content:
+                                'You have already submitted a score for this beatmap with a higher pp value!',
+                            ephemeral: true,
+                        });
+                        return;
+                    }
+                }
+            }
+
             match.team1.scores.push(score);
-            console.log(match.team1.scores);
             await match.save();
         } else if (match.team2.players.find(p => p._id === player._id)) {
+            // check the beatmap ids of all the scores
+            for (let i = 0; i < match.team2.scores.length; i++) {
+                let oldScore = match.team2.scores[i];
+                if (oldScore.beatmapId === score.beatmapId) {
+                    if (oldScore.pp < score.pp) {
+                        match.team2.scores.splice(i, 1);
+                    } else {
+                        await InteractionUtils.send(intr, {
+                            content:
+                                'You have already submitted a score for this beatmap with a higher pp value!',
+                            ephemeral: true,
+                        });
+                        return;
+                    }
+                }
+            }
+
             match.team2.scores.push(score);
             await match.save();
         } else {
@@ -128,7 +163,14 @@ export class PpSubmitPlayCommand implements Command {
             return;
         }
 
-        const mods = play.mods.length > 0 ? play.mods.join() : 'NM';
+        const mods = play.mods.length > 0 ? play.mods.join('') : 'NM';
+        if (mods.includes('EZ')) {
+            if (mods.includes('DT')) {
+                score.pp *= 1.25;
+            } else {
+                score.pp *= 1.5;
+            }
+        }
 
         scoreEmbed
             .addFields({
@@ -136,6 +178,6 @@ export class PpSubmitPlayCommand implements Command {
                 value: `${score.pp.toFixed(2)} pp for ${(score.accuracy * 100).toFixed(2)}%`,
             })
             .setThumbnail(score.list);
-        await InteractionUtils.send(intr, scoreEmbed);
+        await InteractionUtils.send(intr, { embeds: [scoreEmbed], ephemeral: false });
     }
 }

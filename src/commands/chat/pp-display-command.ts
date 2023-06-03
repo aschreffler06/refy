@@ -15,5 +15,8 @@ export class TestCommand implements Command {
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
         await InteractionUtils.send(intr, Lang.getEmbed('displayEmbeds.test', data.lang));
+        //get all scores for person running the command's team
+
+        //run pp formula for all scores (pp * .95 ^ (x-1)) x is 1 for top play, 2 for second, etc.
     }
 }

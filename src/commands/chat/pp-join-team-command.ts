@@ -11,7 +11,7 @@ import { Command, CommandDeferType } from '../index.js';
 export class PpJoinTeamCommand implements Command {
     public names = [Lang.getRef('chatCommands.ppJoinTeam', Language.Default)];
     public cooldown = new RateLimiter(1, 5000);
-    public deferType = CommandDeferType.PUBLIC;
+    public deferType = CommandDeferType.HIDDEN;
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
@@ -27,6 +27,13 @@ export class PpJoinTeamCommand implements Command {
 
         //TODO: make it so people can't join more than one team
         const player = await Player.findOne({ discord: intr.user.id }).exec();
+        if (!player) {
+            await InteractionUtils.send(
+                intr,
+                `You are not registered as a player. Please try running the /link command and try again.`
+            );
+            return;
+        }
         if (args.teamName === match.team1.name) {
             match.team1.players.push(player);
             await match.save();
@@ -41,6 +48,9 @@ export class PpJoinTeamCommand implements Command {
             return;
         }
 
-        await InteractionUtils.send(intr, `Joined team **${args.teamName}**!`);
+        await InteractionUtils.send(intr, {
+            content: `Joined team **${args.teamName}**!`,
+            ephemeral: true,
+        });
     }
 }
