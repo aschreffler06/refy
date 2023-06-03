@@ -2,6 +2,8 @@
  * @description Setup command for auction. This command will create a new auction in the database.
  */
 
+//TODO: find the bug that causes the model to not submit (still goes into db)
+
 import {
     ButtonStyle,
     CacheType,
@@ -40,7 +42,7 @@ export class AuctionSetupCommand implements Command {
         const auctionCreatePrompt = await InteractionUtils.send(
             intr,
             {
-                content: `For this setup, you will need to have a list of the bidders' discord tags (ex. solar#0006). These should be comma separated.`,
+                content: `For this setup, you will need to have a list of the bidders' discord ids. These should be comma separated.`,
                 components: [
                     {
                         type: ComponentType.ActionRow,
