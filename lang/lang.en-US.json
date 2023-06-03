@@ -221,7 +221,9 @@
             "name": "name",
             "id": "id",
             "recent": "recent",
-            "showAll": "show-all"
+            "showAll": "show-all",
+            "team1Name": "team1-name",
+            "team2Name": "team2-name"
         },
         "commandDescs": {
             "help": "Find help or contact support.",
@@ -247,7 +249,9 @@
             "name": "Name",
             "id": "ID",
             "recent": "Recent Number",
-            "showAll": "Show all"
+            "showAll": "Show all",
+            "team1Name": "Team 1 Name",
+            "team2Name": "Team 2 Name"
         },
         "fields": {
             "commands": "Commands",

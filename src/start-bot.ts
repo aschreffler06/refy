@@ -14,6 +14,8 @@ import {
     HelpCommand,
     InfoCommand,
     LinkCommand,
+    PpCreateMatchCommand,
+    PpJoinTeamCommand,
     PpSubmitPlayCommand,
     TestCommand,
 } from './commands/chat/index.js';
@@ -87,6 +89,8 @@ async function start(): Promise<void> {
         new AuctionStartCommand(),
         new CreateTicketCommand(),
         new LinkCommand(),
+        new PpCreateMatchCommand(),
+        new PpJoinTeamCommand(),
         new PpSubmitPlayCommand(),
 
         // Message Context Commands

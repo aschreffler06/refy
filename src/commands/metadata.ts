@@ -135,6 +135,42 @@ export const ChatCommandMetadata: {
             },
         ],
     },
+    PP_CREATE_MATCH: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppCreateMatch', Language.Default),
+        description: Lang.getRef('commandDescs.ppCreateMatch', Language.Default),
+        dm_permission: true,
+        default_member_permissions: PermissionsBitField.resolve([
+            PermissionFlagsBits.ManageGuild,
+        ]).toString(),
+        options: [
+            {
+                ...Args.NAME,
+                required: true,
+            },
+            {
+                ...Args.TEAM1_NAME,
+                required: true,
+            },
+            {
+                ...Args.TEAM2_NAME,
+                required: true,
+            },
+        ],
+    },
+    PP_JOIN_TEAM: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppJoinTeam', Language.Default),
+        description: Lang.getRef('commandDescs.ppJoinTeam', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+        options: [
+            {
+                ...Args.NAME,
+                required: true,
+            },
+        ],
+    },
     PP_SUBMIT_PLAY: {
         type: ApplicationCommandType.ChatInput,
         name: Lang.getRef('chatCommands.ppSubmitPlay', Language.Default),

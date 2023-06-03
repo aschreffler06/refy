@@ -36,6 +36,7 @@
     },
     "dependencies": {
         "@discordjs/rest": "1.5.0",
+        "@kionell/osu-pp-calculator": "^3.2.14",
         "axios": "^1.4.0",
         "class-transformer": "0.5.1",
         "class-validator": "0.14.0",
@@ -50,6 +51,9 @@
         "mongoose": "^7.0.2",
         "node-fetch": "3.3.0",
         "node-schedule": "2.1.0",
+        "osu-classes": "^2.2.1",
+        "osu-parsers": "^4.0.0",
+        "osu-standard-stable": "^4.0.4",
         "pino": "8.8.0",
         "pino-pretty": "9.1.1",
         "pm2": "^5.2.2",

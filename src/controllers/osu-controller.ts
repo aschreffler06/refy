@@ -2,8 +2,8 @@ import axios from 'axios';
 import { createRequire } from 'node:module';
 
 import { GetUserParams } from '../enums/index.js';
-import { OsuScore } from '../models/data-objects/osu-score.js';
-import { OsuUserInfo } from '../models/data-objects/osu-user-info.js';
+import { OsuScoreDTO } from '../models/data-objects/osu-score-dto.js';
+import { OsuUserInfoDTO } from '../models/data-objects/osu-user-info-dto.js';
 import { Player, Token } from '../models/database/index.js';
 // import { Request, Response, Router } from 'express';
 // import router from 'express-promise-router';
@@ -60,7 +60,7 @@ export class OsuController {
         }
     }
 
-    public async getUser({ id = null, username = null }: GetUserParams): Promise<OsuUserInfo> {
+    public async getUser({ id = null, username = null }: GetUserParams): Promise<OsuUserInfoDTO> {
         const token = await this.getAuthToken();
         const config = {
             headers: { Authorization: `Bearer ${token}` },
@@ -77,7 +77,7 @@ export class OsuController {
             } else {
                 throw new Error('No id or username provided');
             }
-            return new OsuUserInfo(
+            return new OsuUserInfoDTO(
                 user.data.id,
                 user.data.username,
                 user.data.statistics.global_rank,
@@ -98,7 +98,7 @@ export class OsuController {
      * @param discordId
      * @returns
      */
-    public async getRecentPlays(discordId: string): Promise<OsuScore[]> {
+    public async getRecentPlays(discordId: string): Promise<OsuScoreDTO[]> {
         const token = await this.getAuthToken();
         const config = {
             headers: { Authorization: `Bearer ${token}` },
@@ -109,18 +109,26 @@ export class OsuController {
             `${this.osuEndpoint}/users/${osuId}/scores/recent?limit=25`,
             config
         );
-        const scores: OsuScore[] = [];
+        const scores: OsuScoreDTO[] = [];
         for (const play of recentPlays.data) {
             scores.push(
-                new OsuScore(
+                new OsuScoreDTO(
                     play.id,
                     play.user.id,
+                    play.accuracy,
+                    play.statistics.count_300,
+                    play.statistics.count_100,
+                    play.statistics.count_50,
+                    play.statistics.count_miss,
+                    play.max_combo,
                     play.pp,
                     play.rank,
                     play.mods,
                     Math.trunc(new Date(play.created_at).getTime() / 1000),
                     play.mode,
                     play.passed,
+                    play.beatmap.id,
+                    play.beatmap.status,
                     play.beatmapset.title,
                     play.beatmap.version,
                     play.beatmap.url,

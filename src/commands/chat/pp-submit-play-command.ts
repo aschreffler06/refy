@@ -1,9 +1,10 @@
+import { ScoreCalculator } from '@kionell/osu-pp-calculator';
 import { ChatInputCommandInteraction, EmbedBuilder, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { OsuController } from '../../controllers/osu-controller.js';
-import { OsuScore } from '../../models/data-objects/index.js';
-import { Player } from '../../models/database/index.js';
+import { OsuScoreDTO } from '../../models/data-objects/index.js';
+import { OsuScore, Player, PpMatch } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
@@ -24,12 +25,12 @@ export class PpSubmitPlayCommand implements Command {
         const osuController = new OsuController();
         const recentPlays = await osuController.getRecentPlays(intr.user.id);
         const player = await Player.findOne({ discord: intr.user.id }).exec();
-        let playEmbed = new EmbedBuilder().setTitle('Submitted Play').setAuthor({
+        let scoreEmbed = new EmbedBuilder().setTitle('Submitted Play').setAuthor({
             name: player.username,
             iconURL: player.avatar,
             url: `https://osu.ppy.sh/users/${player._id}`,
         });
-        let play: OsuScore;
+        let play: OsuScoreDTO;
         if (!args.recent) {
             play = recentPlays[0];
         } else if (args.recent <= recentPlays.length) {
@@ -40,13 +41,101 @@ export class PpSubmitPlayCommand implements Command {
                 `You don't have that many recent plays! (Does not include fails)`
             );
         }
-        //TODO: Check id and then put in db
-        playEmbed
+
+        //TODO: write this better
+        if (play.createdAt < 1685750400) {
+            InteractionUtils.send(intr, 'This play is too old to submit!');
+            return;
+        }
+
+        if (play.status !== 'ranked') {
+            await InteractionUtils.send(intr, 'This beatmap is not ranked!');
+            return;
+        }
+
+        let pp;
+        if (!play.pp) {
+            const scoreCalculator = new ScoreCalculator();
+
+            const result = await scoreCalculator.calculate({
+                beatmapId: Number(play.beatmapId),
+                mods: play.mods.join(),
+                accuracy: play.accuracy,
+                count300: play.count300,
+                count100: play.count100,
+                count50: play.count50,
+                countMiss: play.countMiss,
+                maxCombo: play.maxCombo,
+            });
+            pp = result.performance.totalPerformance;
+        } else {
+            pp = play.pp;
+        }
+
+        const score = new OsuScore({
+            _id: play.id,
+            userId: player._id,
+            accuracy: play.accuracy,
+            count300: play.count300,
+            count100: play.count100,
+            count50: play.count50,
+            countMiss: play.countMiss,
+            maxCombo: play.maxCombo,
+            pp: pp,
+            rank: play.rank,
+            mods: play.mods,
+            created_at: play.createdAt,
+            mode: play.mode,
+            passed: play.passed,
+            beatmapId: play.beatmapId,
+            status: play.status,
+            title: play.title,
+            version: play.version,
+            url: play.url,
+            list: play.list,
+        });
+
+        try {
+            await score.save();
+        } catch (err) {
+            if (err.code === 11000) {
+                await InteractionUtils.send(intr, 'You have already submitted this play!');
+                return;
+            } else {
+                console.log(err);
+                await InteractionUtils.send(
+                    intr,
+                    'Something went wrong. Please try again later or contact the host.'
+                );
+                return;
+            }
+        }
+
+        // find which team the player submitting is on and then add this to that team's scores array
+        const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
+        if (match.team1.players.find(p => p._id === player._id)) {
+            match.team1.scores.push(score);
+            console.log(match.team1.scores);
+            await match.save();
+        } else if (match.team2.players.find(p => p._id === player._id)) {
+            match.team2.scores.push(score);
+            await match.save();
+        } else {
+            await InteractionUtils.send(
+                intr,
+                'You are not on either team! Please contact the host.'
+            );
+            return;
+        }
+
+        const mods = play.mods.length > 0 ? play.mods.join() : 'NM';
+
+        scoreEmbed
             .addFields({
-                name: `${play.title} [${play.version}] **${play.mods.join('')}**`,
-                value: `Worth ${play.pp.toFixed(2)} pp!`,
+                name: `${score.title} [${score.version}] +**${mods}**`,
+                value: `${score.pp.toFixed(2)} pp for ${(score.accuracy * 100).toFixed(2)}%`,
             })
-            .setThumbnail(play.list);
-        await InteractionUtils.send(intr, playEmbed);
+            .setThumbnail(score.list);
+        await InteractionUtils.send(intr, scoreEmbed);
     }
 }

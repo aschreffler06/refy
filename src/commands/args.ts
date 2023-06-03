@@ -72,4 +72,16 @@ export class Args {
         type: ApplicationCommandOptionType.Number,
         required: false,
     };
+    public static readonly TEAM1_NAME: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.team1Name', Language.Default),
+        description: Lang.getRef('argDescs.team1Name', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+    };
+    public static readonly TEAM2_NAME: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.team2Name', Language.Default),
+        description: Lang.getRef('argDescs.team2Name', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+    };
 }

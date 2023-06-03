@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { OsuController } from '../../controllers/index.js';
-import { OsuUserInfo } from '../../models/data-objects/index.js';
+import { OsuUserInfoDTO } from '../../models/data-objects/index.js';
 import { Player } from '../../models/database/player.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
@@ -23,7 +23,7 @@ export class LinkCommand implements Command {
         };
 
         const osuController = new OsuController();
-        const userInfo: OsuUserInfo = await osuController.getUser({
+        const userInfo: OsuUserInfoDTO = await osuController.getUser({
             username: args.name,
         });
 

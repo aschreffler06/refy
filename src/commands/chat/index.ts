@@ -9,4 +9,6 @@ export { AuctionDisplayCommand } from './auction-display-command.js';
 export { AuctionStartCommand } from './auction-start-command.js';
 export { AuctionSaleCommand } from './auction-sale-command.js';
 export { LinkCommand } from './link-command.js';
+export { PpCreateMatchCommand } from './pp-create-match-command.js';
+export { PpJoinTeamCommand } from './pp-join-team-command.js';
 export { PpSubmitPlayCommand } from './pp-submit-play-command.js';

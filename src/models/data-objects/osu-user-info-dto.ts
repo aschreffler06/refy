@@ -2,7 +2,7 @@
  * A class to hold information about a user.
  */
 
-export class OsuUserInfo {
+export class OsuUserInfoDTO {
     id: number;
     username: string;
     rank: number;

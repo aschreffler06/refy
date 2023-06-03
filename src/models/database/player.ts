@@ -1,6 +1,7 @@
 import { model, Schema } from 'mongoose';
 
 interface IPlayer {
+    //TODO: change to string because im really smart
     _id: number;
     username: string;
     discord: string;
