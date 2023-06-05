@@ -59,13 +59,14 @@ export class PpSubmitPlayCommand implements Command {
 
             const result = await scoreCalculator.calculate({
                 beatmapId: Number(play.beatmapId),
-                mods: play.mods.join(),
+                mods: play.mods.join(''),
                 accuracy: play.accuracy,
                 count300: play.count300,
                 count100: play.count100,
                 count50: play.count50,
                 countMiss: play.countMiss,
                 maxCombo: play.maxCombo,
+                rulesetId: 0,
             });
             pp = result.performance.totalPerformance;
         } else {
@@ -165,7 +166,7 @@ export class PpSubmitPlayCommand implements Command {
 
         const mods = play.mods.length > 0 ? play.mods.join('') : 'NM';
         if (mods.includes('EZ')) {
-            if (mods.includes('DT')) {
+            if (mods.includes('DT') || mods.includes('NC')) {
                 score.pp *= 1.25;
             } else {
                 score.pp *= 1.5;

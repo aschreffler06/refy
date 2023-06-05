@@ -158,6 +158,13 @@ export const ChatCommandMetadata: {
             },
         ],
     },
+    PP_DISPLAY: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppDisplay', Language.Default),
+        description: Lang.getRef('commandDescs.ppDisplay', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+    },
     PP_JOIN_TEAM: {
         type: ApplicationCommandType.ChatInput,
         name: Lang.getRef('chatCommands.ppJoinTeam', Language.Default),

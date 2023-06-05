@@ -15,6 +15,7 @@ import {
     InfoCommand,
     LinkCommand,
     PpCreateMatchCommand,
+    PpDisplayCommand,
     PpJoinTeamCommand,
     PpSubmitPlayCommand,
     TestCommand,
@@ -90,6 +91,7 @@ async function start(): Promise<void> {
         new CreateTicketCommand(),
         new LinkCommand(),
         new PpCreateMatchCommand(),
+        new PpDisplayCommand(),
         new PpJoinTeamCommand(),
         new PpSubmitPlayCommand(),
 

@@ -69,12 +69,12 @@ export class AuctionSaleCommand implements Command {
         bidCollector.on('collect', async m => {
             switch (true) {
                 case /^bid [$]\d{1,3}$/.test(m.content): {
-                    bidCollector.resetTimer({ time: 10000 });
+                    bidCollector.resetTimer({ time: 15000 });
                     const bid = parseInt(m.content.split('$')[1]);
                     if (!isBidValid(bid)) {
                         await InteractionUtils.send(
                             intr,
-                            `<@${m.author.id}> Bid must be a multiple of $25 and between $25 and $600`
+                            `<@${m.author.id}> Bid must be a multiple of $25 and between $25 and $575`
                         );
                         return;
                     }
@@ -113,5 +113,5 @@ export class AuctionSaleCommand implements Command {
 }
 
 function isBidValid(bid: number): boolean {
-    return bid % 25 === 0 && bid >= 25 && bid <= 600;
+    return bid % 25 === 0 && bid >= 25 && bid <= 575;
 }
