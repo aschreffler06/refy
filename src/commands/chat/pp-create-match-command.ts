@@ -11,7 +11,7 @@ import { Command, CommandDeferType } from '../index.js';
 export class PpCreateMatchCommand implements Command {
     public names = [Lang.getRef('chatCommands.ppCreateMatch', Language.Default)];
     public cooldown = new RateLimiter(1, 5000);
-    public deferType = CommandDeferType.PUBLIC;
+    public deferType = CommandDeferType.HIDDEN;
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
@@ -22,8 +22,6 @@ export class PpCreateMatchCommand implements Command {
 
         const args = {
             name: intr.options.getString(Lang.getRef('arguments.name', data.lang)),
-            team1Name: intr.options.getString(Lang.getRef('arguments.team1Name', data.lang)),
-            team2Name: intr.options.getString(Lang.getRef('arguments.team2Name', data.lang)),
         };
 
         let match = new PpMatch({
@@ -31,10 +29,11 @@ export class PpCreateMatchCommand implements Command {
             guildId: intr.guildId,
         });
 
-        match.createTeams(args.team1Name, args.team2Name);
-
         await match.save();
 
-        await InteractionUtils.send(intr, `Created match **${match.name}**!`);
+        await InteractionUtils.send(intr, {
+            content: `Created match **${match.name}**!`,
+            ephemeral: true,
+        });
     }
 }

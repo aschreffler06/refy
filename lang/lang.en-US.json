@@ -204,9 +204,11 @@
             "auctionStart": "auction-start",
             "createTicket": "create-ticket",
             "link": "link",
+            "ppCreateLeaderboard": "pp-create-leaderboard",
             "ppCreateMatch": "pp-create-match",
             "ppCreateTeam": "pp-create-team",
             "ppDisplay": "pp-display",
+            "ppGetScore": "pp-get-score",
             "ppJoinTeam": "pp-join-team",
             "ppSubmitPlay": "pp-submit-play"
         },
@@ -220,10 +222,12 @@
             "option": "option",
             "name": "name",
             "id": "id",
+            "lowerRank": "lower-rank",
             "recent": "recent",
             "showAll": "show-all",
             "team1Name": "team1-name",
-            "team2Name": "team2-name"
+            "team2Name": "team2-name",
+            "upperRank": "upper-rank"
         },
         "commandDescs": {
             "help": "Find help or contact support.",
@@ -236,9 +240,11 @@
             "auctionShowItems": "Shows your items",
             "auctionStart": "Start an auction. Type 'stop-auction' to stop the auction.",
             "createTicket": "Create a ticket for bot support.",
+            "ppCreateLeaderboard": "Create a pp leaderboard for the current match.",
             "ppCreateMatch": "Create a match for a pp leaderboard team showdown.",
             "ppCreateTeam": "Create a team for a leaderboard showdown.",
             "ppDisplay": "Display the leaderboard for this server for a given leaderboard showdown.",
+            "ppGetScore": "Given an osu beatmap id, get the current leaderboard score for that map",
             "ppJoinTeam": "Join a team for the leaderboard showdown.",
             "ppSubmitPlay": "Submit a play for the leaderboard for your team.",
             "link": "Link your osu account"
@@ -247,11 +253,13 @@
             "helpOption": "Option.",
             "infoOption": "Option.",
             "name": "Name",
+            "lowerRank": "Lower Rank Bound",
             "id": "ID",
             "recent": "Recent Number",
             "showAll": "Show all",
             "team1Name": "Team 1 Name",
-            "team2Name": "Team 2 Name"
+            "team2Name": "Team 2 Name",
+            "upperRank": "Upper Rank Bound"
         },
         "fields": {
             "commands": "Commands",

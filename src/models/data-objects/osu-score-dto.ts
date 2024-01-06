@@ -17,6 +17,7 @@ export class OsuScoreDTO {
     maxCombo: number;
     pp: number;
     rank: OsuRank;
+    score: number;
     mods: OsuMod[];
     createdAt: number;
     mode: OsuMode;
@@ -40,6 +41,7 @@ export class OsuScoreDTO {
         maxCombo: number,
         pp: number,
         rank: OsuRank,
+        score: number,
         mods: OsuMod[],
         createdAt: number,
         mode: OsuMode,
@@ -61,6 +63,7 @@ export class OsuScoreDTO {
         this.maxCombo = maxCombo;
         this.pp = pp;
         this.rank = rank;
+        this.score = score;
         this.mods = mods;
         this.createdAt = createdAt;
         this.mode = mode;

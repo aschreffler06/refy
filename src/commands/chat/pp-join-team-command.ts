@@ -25,7 +25,6 @@ export class PpJoinTeamCommand implements Command {
             return;
         }
 
-        //TODO: make it so people can't join more than one team
         const player = await Player.findOne({ discord: intr.user.id }).exec();
         if (!player) {
             await InteractionUtils.send(
@@ -34,23 +33,31 @@ export class PpJoinTeamCommand implements Command {
             );
             return;
         }
-        if (args.teamName === match.team1.name) {
-            match.team1.players.push(player);
-            await match.save();
-        } else if (args.teamName === match.team2.name) {
-            match.team2.players.push(player);
-            await match.save();
-        } else {
-            await InteractionUtils.send(
-                intr,
-                `That team name is not in the match. Double check to make sure that you typed the name in correctly.`
-            );
-            return;
+        for (const team of match.teams) {
+            for (const player of team.players) {
+                if (player.discord === intr.user.id) {
+                    await InteractionUtils.send(
+                        intr,
+                        `You are already registered as a player in this match! Contact an admin if you need switched to a different team.`
+                    );
+                    return;
+                }
+            }
         }
-
-        await InteractionUtils.send(intr, {
-            content: `Joined team **${args.teamName}**!`,
-            ephemeral: true,
-        });
+        for (const team of match.teams) {
+            if (team.name === args.teamName) {
+                team.players.push(player);
+                await match.save();
+                await InteractionUtils.send(intr, {
+                    content: `Joined team **${args.teamName}**!`,
+                    ephemeral: true,
+                });
+                return;
+            }
+        }
+        await InteractionUtils.send(
+            intr,
+            `Could not find a team with the name **${args.teamName}**. If you believe this is an error, contact an admin.`
+        );
     }
 }

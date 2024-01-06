@@ -8,25 +8,31 @@ import { Lang } from '../../services/index.js';
 import { InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 
-export class PpCreateTeamCommand implements Command {
-    public names = [Lang.getRef('chatCommands.ppCreateTeam', Language.Default)];
+export class PpCreateLeaderboardCommand implements Command {
+    public names = [Lang.getRef('chatCommands.ppCreateLeaderboard', Language.Default)];
     public cooldown = new RateLimiter(1, 5000);
     public deferType = CommandDeferType.HIDDEN;
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
-        const args = {
-            name: intr.options.getString(Lang.getRef('arguments.name', data.lang)),
-        };
         const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
         if (!match) {
             await InteractionUtils.send(intr, `No match is currently in progress for this server.`);
             return;
         }
-        match.addTeam(args.name);
+
+        const args = {
+            lowerRank: intr.options.getInteger(Lang.getRef('arguments.lowerRank', data.lang)),
+            upperRank: intr.options.getInteger(Lang.getRef('arguments.upperRank', data.lang)),
+        };
+
+        //TODO: make it so ranges can't overlap
+        match.addLeaderboard(args.lowerRank, args.upperRank);
+
         await match.save();
+
         await InteractionUtils.send(intr, {
-            content: `Added team **${args.name}**!`,
+            content: `Added leaderboard for the rank range: ${args.lowerRank}-${args.upperRank}!`,
             ephemeral: true,
         });
     }

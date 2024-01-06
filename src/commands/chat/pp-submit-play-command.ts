@@ -1,5 +1,5 @@
 import { ScoreCalculator } from '@kionell/osu-pp-calculator';
-import { ChatInputCommandInteraction, EmbedBuilder, PermissionsString } from 'discord.js';
+import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { OsuController } from '../../controllers/osu-controller.js';
@@ -8,13 +8,13 @@ import { OsuScore, Player, PpMatch } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
-import { InteractionUtils } from '../../utils/index.js';
+import { InteractionUtils, PpLeaderboardUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 
 export class PpSubmitPlayCommand implements Command {
     public names = [Lang.getRef('chatCommands.ppSubmitPlay', Language.Default)];
     public cooldown = new RateLimiter(1, 5000);
-    public deferType = CommandDeferType.NONE;
+    public deferType = CommandDeferType.PUBLIC;
     public requireClientPerms: PermissionsString[] = [];
 
     //TODO: make it so you can submit a score id as well
@@ -25,11 +25,7 @@ export class PpSubmitPlayCommand implements Command {
         const osuController = new OsuController();
         const recentPlays = await osuController.getRecentPlays(intr.user.id);
         const player = await Player.findOne({ discord: intr.user.id }).exec();
-        let scoreEmbed = new EmbedBuilder().setTitle('Submitted Play').setAuthor({
-            name: player.username,
-            iconURL: player.avatar,
-            url: `https://osu.ppy.sh/users/${player._id}`,
-        });
+
         let play: OsuScoreDTO;
         if (!args.recent) {
             play = recentPlays[0];
@@ -43,7 +39,7 @@ export class PpSubmitPlayCommand implements Command {
         }
 
         //TODO: write this better
-        if (play.createdAt < 1685750400) {
+        if (play.createdAt < 1704258000) {
             InteractionUtils.send(intr, 'This play is too old to submit!');
             return;
         }
@@ -84,6 +80,7 @@ export class PpSubmitPlayCommand implements Command {
             maxCombo: play.maxCombo,
             pp: pp,
             rank: play.rank,
+            score: play.score,
             mods: play.mods,
             created_at: play.createdAt,
             mode: play.mode,
@@ -94,6 +91,7 @@ export class PpSubmitPlayCommand implements Command {
             version: play.version,
             url: play.url,
             list: play.list,
+            teamName: '',
         });
 
         try {
@@ -112,73 +110,55 @@ export class PpSubmitPlayCommand implements Command {
             }
         }
 
-        // find which team the player submitting is on and then add this to that team's scores array
         const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
 
-        if (match.team1.players.find(p => p._id === player._id)) {
-            //TODO: refactor into method but im really busy right now
-            // check the beatmap ids of all the scores and compare to the beatmap id of the score, store the one with the top pp value
-            for (let i = 0; i < match.team1.scores.length; i++) {
-                let oldScore = match.team1.scores[i];
-                if (oldScore.beatmapId === score.beatmapId) {
-                    if (oldScore.pp < score.pp) {
-                        match.team1.scores.splice(i, 1);
-                    } else {
-                        await InteractionUtils.send(intr, {
-                            content:
-                                'You have already submitted a score for this beatmap with a higher pp value!',
-                            ephemeral: true,
-                        });
-                        return;
-                    }
-                }
-            }
+        //TODO: generalize error messages for things like this
+        if (!match) {
+            await InteractionUtils.send(intr, 'There is no match going in this server!');
+            return;
+        }
 
-            match.team1.scores.push(score);
-            await match.save();
-        } else if (match.team2.players.find(p => p._id === player._id)) {
-            // check the beatmap ids of all the scores
-            for (let i = 0; i < match.team2.scores.length; i++) {
-                let oldScore = match.team2.scores[i];
-                if (oldScore.beatmapId === score.beatmapId) {
-                    if (oldScore.pp < score.pp) {
-                        match.team2.scores.splice(i, 1);
-                    } else {
-                        await InteractionUtils.send(intr, {
-                            content:
-                                'You have already submitted a score for this beatmap with a higher pp value!',
-                            ephemeral: true,
-                        });
-                        return;
-                    }
-                }
-            }
-
-            match.team2.scores.push(score);
-            await match.save();
-        } else {
+        // find which team the player submitting is on and then add this to that team's scores array
+        const team = match.teams.find(t => t.players.find(p => p._id === player._id));
+        if (!team) {
             await InteractionUtils.send(
                 intr,
-                'You are not on either team! Please contact the host.'
+                'You are not on either team or something went wrong! Please make sure you are on a team or contact the host.'
             );
             return;
         }
 
-        const mods = play.mods.length > 0 ? play.mods.join('') : 'NM';
-        if (mods.includes('EZ')) {
-            if (mods.includes('DT') || mods.includes('NC')) {
-                score.pp *= 1.25;
+        score.teamName = team.name;
+
+        const leaderboards = match.leaderboards;
+        let currLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, leaderboards);
+
+        // find if there is any score that matches the same map
+
+        const oldScore = PpLeaderboardUtils.getMapOnLeaderbaord(currLeaderboard, score.beatmapId);
+
+        if (oldScore) {
+            if (oldScore.pp < score.pp) {
+                currLeaderboard.scores.splice(currLeaderboard.scores.indexOf(oldScore), 1);
+                await InteractionUtils.send(intr, {
+                    content: `You've just sniped this score!`,
+                    ephemeral: true,
+                    embeds: [PpLeaderboardUtils.createScoreEmbed(player, oldScore)],
+                });
             } else {
-                score.pp *= 1.5;
+                await InteractionUtils.send(intr, {
+                    content: 'There is already a score on this map worth more pp.',
+                    ephemeral: true,
+                });
+                return;
             }
         }
 
-        scoreEmbed
-            .addFields({
-                name: `${score.title} [${score.version}] +**${mods}**`,
-                value: `${score.pp.toFixed(2)} pp for ${(score.accuracy * 100).toFixed(2)}%`,
-            })
-            .setThumbnail(score.list);
+        currLeaderboard.scores.push(score);
+
+        await match.save();
+
+        const scoreEmbed = PpLeaderboardUtils.createScoreEmbed(player, score);
         await InteractionUtils.send(intr, { embeds: [scoreEmbed], ephemeral: false });
     }
 }

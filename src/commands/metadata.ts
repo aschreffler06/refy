@@ -135,6 +135,25 @@ export const ChatCommandMetadata: {
             },
         ],
     },
+    PP_CREATE_LEADERBOARD: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppCreateLeaderboard', Language.Default),
+        description: Lang.getRef('commandDescs.ppCreateLeaderboard', Language.Default),
+        dm_permission: true,
+        default_member_permissions: PermissionsBitField.resolve([
+            PermissionFlagsBits.ManageGuild,
+        ]).toString(),
+        options: [
+            {
+                ...Args.LOWER_RANK,
+                required: true,
+            },
+            {
+                ...Args.UPPER_RANK,
+                required: true,
+            },
+        ],
+    },
     PP_CREATE_MATCH: {
         type: ApplicationCommandType.ChatInput,
         name: Lang.getRef('chatCommands.ppCreateMatch', Language.Default),
@@ -148,12 +167,19 @@ export const ChatCommandMetadata: {
                 ...Args.NAME,
                 required: true,
             },
+        ],
+    },
+    PP_CREATE_TEAM: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppCreateTeam', Language.Default),
+        description: Lang.getRef('commandDescs.ppCreateTeam', Language.Default),
+        dm_permission: true,
+        default_member_permissions: PermissionsBitField.resolve([
+            PermissionFlagsBits.ManageGuild,
+        ]).toString(),
+        options: [
             {
-                ...Args.TEAM1_NAME,
-                required: true,
-            },
-            {
-                ...Args.TEAM2_NAME,
+                ...Args.NAME,
                 required: true,
             },
         ],
@@ -164,6 +190,19 @@ export const ChatCommandMetadata: {
         description: Lang.getRef('commandDescs.ppDisplay', Language.Default),
         dm_permission: true,
         default_member_permissions: undefined,
+    },
+    PP_GET_SCORE: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppGetScore', Language.Default),
+        description: Lang.getRef('commandDescs.ppGetScore', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+        options: [
+            {
+                ...Args.ID,
+                required: true,
+            },
+        ],
     },
     PP_JOIN_TEAM: {
         type: ApplicationCommandType.ChatInput,

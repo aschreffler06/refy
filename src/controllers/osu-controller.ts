@@ -123,6 +123,7 @@ export class OsuController {
                     play.max_combo,
                     play.pp,
                     play.rank,
+                    play.score,
                     play.mods,
                     Math.trunc(new Date(play.created_at).getTime() / 1000),
                     play.mode,

@@ -37,6 +37,7 @@
     "dependencies": {
         "@discordjs/rest": "1.5.0",
         "@kionell/osu-pp-calculator": "^3.2.14",
+        "@types/mongoose": "^5.11.97",
         "axios": "^1.4.0",
         "class-transformer": "0.5.1",
         "class-validator": "0.14.0",

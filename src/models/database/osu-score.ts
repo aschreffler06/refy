@@ -13,6 +13,7 @@ interface IOsuScore {
     maxCombo: number;
     pp: number;
     rank: OsuRank;
+    score: number;
     mods: OsuMod[];
     created_at: number;
     mode: OsuMode;
@@ -24,6 +25,7 @@ interface IOsuScore {
     version: string;
     url: string;
     list: string;
+    teamName: string;
 }
 
 const osuScoreSchema = new Schema<IOsuScore>({
@@ -37,6 +39,7 @@ const osuScoreSchema = new Schema<IOsuScore>({
     maxCombo: { type: Number, required: true },
     pp: { type: Number, required: true },
     rank: { type: String, required: true },
+    score: { type: Number, required: true },
     mods: { type: [String], required: true },
     created_at: { type: Number, required: true },
     mode: { type: String, required: true },
@@ -47,6 +50,7 @@ const osuScoreSchema = new Schema<IOsuScore>({
     version: { type: String, required: true },
     url: { type: String, required: true },
     list: { type: String, required: true },
+    teamName: { type: String, required: false },
 });
 
 const OsuScore = model('OsuScore', osuScoreSchema);
