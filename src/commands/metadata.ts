@@ -190,6 +190,11 @@ export const ChatCommandMetadata: {
         description: Lang.getRef('commandDescs.ppDisplay', Language.Default),
         dm_permission: true,
         default_member_permissions: undefined,
+        // options: [
+        //     {
+        //         ...Args.SHOW_ALL,
+        //     },
+        // ],
     },
     PP_GET_SCORE: {
         type: ApplicationCommandType.ChatInput,

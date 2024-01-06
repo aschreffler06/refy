@@ -16,10 +16,20 @@ export class PpDisplayCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, _data: EventData): Promise<void> {
+        // const args = {
+        //     showAll: intr.options.getBoolean(Lang.getRef('arguments.showAll', _data.lang)),
+        // }
+
         const match = await PpMatch.findOne({ guildId: intr.guildId });
         const player = await Player.findOne({ discord: intr.user.id }).exec();
         const leaderboards = match.leaderboards;
         const currentLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, leaderboards);
+
+        // if (showAll) {
+        //     for (const leaderboard of leaderboards) {
+
+        //     }
+        // }
 
         // make a map with the team names as the keys and the pp of the plays as the values
         const teamMap = new Map<string, number[]>();
@@ -42,7 +52,7 @@ export class PpDisplayCommand implements Command {
             teamPpMap.set(teamName, teamPp);
         }
 
-        let teamsString = '';
+        let teamsString = `Range: ${currentLeaderboard.lowerRank} - ${currentLeaderboard.upperRank}\n\n`;
 
         for (const [teamName, pp] of teamPpMap) {
             teamsString += `${teamName}: **${pp.toFixed(2)}** pp\n`;

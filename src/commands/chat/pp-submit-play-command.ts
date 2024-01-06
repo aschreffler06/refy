@@ -44,7 +44,7 @@ export class PpSubmitPlayCommand implements Command {
             return;
         }
 
-        if (play.status !== 'ranked') {
+        if (play.status !== 'ranked' && play.status !== 'approved') {
             await InteractionUtils.send(intr, 'This beatmap is not ranked!');
             return;
         }
