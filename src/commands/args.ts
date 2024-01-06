@@ -54,4 +54,46 @@ export class Args {
         type: ApplicationCommandOptionType.String,
         required: true,
     };
+    public static readonly ID: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.id', Language.Default),
+        description: Lang.getRef('argDescs.id', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+    };
+    public static readonly LOWER_RANK: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.lowerRank', Language.Default),
+        description: Lang.getRef('argDescs.lowerRank', Language.Default),
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+    };
+    public static readonly RECENT: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.recent', Language.Default),
+        description: Lang.getRef('argDescs.recent', Language.Default),
+        type: ApplicationCommandOptionType.Number,
+        required: false,
+    };
+    public static readonly SHOW_ALL: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.showAll', Language.Default),
+        description: Lang.getRef('argDescs.showAll', Language.Default),
+        type: ApplicationCommandOptionType.Boolean,
+        required: false,
+    };
+    public static readonly TEAM1_NAME: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.team1Name', Language.Default),
+        description: Lang.getRef('argDescs.team1Name', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+    };
+    public static readonly TEAM2_NAME: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.team2Name', Language.Default),
+        description: Lang.getRef('argDescs.team2Name', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+    };
+    public static readonly UPPER_RANK: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.upperRank', Language.Default),
+        description: Lang.getRef('argDescs.upperRank', Language.Default),
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+    };
 }

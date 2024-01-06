@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { Auction } from '../../database/index.js';
+import { Auction } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
@@ -34,7 +34,6 @@ export class AuctionStartCommand implements Command {
             bidder.cash = auction.starting_cash;
             bidder.items = [];
         });
-        console.log(bidders);
 
         const auctionName = auction.name;
 
@@ -47,7 +46,7 @@ export class AuctionStartCommand implements Command {
         const startEmbed = new EmbedBuilder()
             .setTitle(`Auction '${auctionName}' will begin shortly!`)
             .setDescription(
-                `Bidding minimum is $25, maximum is $600, and you can only bid in values divisible by $25.`
+                `Bidding minimum is $25, maximum is $575, and you can only bid in values divisible by $25.\nYou will have 15 seconds for the first bid, and every bid will reset the timer to 10 seconds.\n To bid you need to type \`bid $<number>\``
             )
             .setColor(0xff0000)
             .setAuthor({

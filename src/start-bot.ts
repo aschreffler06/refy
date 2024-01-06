@@ -7,10 +7,20 @@ import {
     AuctionDisplayCommand,
     AuctionSaleCommand,
     AuctionSetupCommand,
+    AuctionShowCashCommand,
+    AuctionShowItemsCommand,
     AuctionStartCommand,
     CreateTicketCommand,
     HelpCommand,
     InfoCommand,
+    LinkCommand,
+    PpCreateLeaderboardCommand,
+    PpCreateMatchCommand,
+    PpCreateTeamCommand,
+    PpDisplayCommand,
+    PpGetScoreCommand,
+    PpJoinTeamCommand,
+    PpSubmitPlayCommand,
     TestCommand,
 } from './commands/chat/index.js';
 import {
@@ -21,6 +31,7 @@ import {
 } from './commands/index.js';
 import { ViewDateSent } from './commands/message/index.js';
 import { ViewDateJoined } from './commands/user/index.js';
+// import { OsuController } from './controllers/index.js';
 import {
     ButtonHandler,
     CommandHandler,
@@ -32,6 +43,7 @@ import {
 } from './events/index.js';
 import { CustomClient } from './extensions/index.js';
 import { Job } from './jobs/index.js';
+// import { Api } from './models/api.js';
 import { Bot } from './models/bot.js';
 import { Reaction } from './reactions/index.js';
 import {
@@ -72,11 +84,22 @@ async function start(): Promise<void> {
         new HelpCommand(),
         new InfoCommand(),
         new TestCommand(),
-        new AuctionSetupCommand(),
+
         new AuctionDisplayCommand(),
-        new AuctionStartCommand(),
         new AuctionSaleCommand(),
+        new AuctionSetupCommand(),
+        new AuctionShowCashCommand(),
+        new AuctionShowItemsCommand(),
+        new AuctionStartCommand(),
         new CreateTicketCommand(),
+        new LinkCommand(),
+        new PpCreateLeaderboardCommand(),
+        new PpCreateMatchCommand(),
+        new PpCreateTeamCommand(),
+        new PpDisplayCommand(),
+        new PpGetScoreCommand(),
+        new PpJoinTeamCommand(),
+        new PpSubmitPlayCommand(),
 
         // Message Context Commands
         new ViewDateSent(),
@@ -147,6 +170,11 @@ async function start(): Promise<void> {
         await new Promise(resolve => setTimeout(resolve, 1000));
         process.exit();
     }
+
+    //test api stuff
+    // let osuController = new OsuController();
+    // let api = new Api([osuController]);
+    // await api.start();
 
     await bot.start();
 }
