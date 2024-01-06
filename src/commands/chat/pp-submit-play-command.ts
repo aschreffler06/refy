@@ -39,7 +39,7 @@ export class PpSubmitPlayCommand implements Command {
         }
 
         //TODO: write this better
-        if (play.createdAt < 1704258000) {
+        if (play.createdAt < 1704502800) {
             InteractionUtils.send(intr, 'This play is too old to submit!');
             return;
         }
