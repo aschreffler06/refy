@@ -45,6 +45,8 @@ export class PpDisplayCommand implements Command {
         // get the total pp for each team
         const teamPpMap = new Map<string, number>();
         for (const [teamName, scores] of teamMap) {
+            scores.sort((a, b) => b - a);
+            console.log(scores);
             let teamPp = 0;
             for (let i = 0; i < scores.length; i++) {
                 teamPp += scores[i] * Math.pow(0.95, i);
