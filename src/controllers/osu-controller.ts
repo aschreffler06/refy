@@ -17,20 +17,7 @@ let Config = require('../../config/config.json');
 
 // export class OsuController implements Controller {
 export class OsuController {
-    // public path = '/osu';
-    // public router: Router = router();
-    // public authToken?: string;
-
-    //TODO: ask scott if this needs changed to host this on a server
-    private localApi = axios.create({
-        baseURL: `http://localhost:${Config.api.port}`,
-    });
     private osuEndpoint = 'https://osu.ppy.sh/api/v2';
-
-    // public register(): void {
-    //     this.router.get('/auth-token', (req, res) => this.getAuthToken(req, res));
-    //     this.router.get('/user', (req, res) => this.getUser(req, res));
-    // }
 
     private async getAuthToken(forceNew: boolean = false): Promise<string> {
         const bodyParameters = {
@@ -121,6 +108,8 @@ export class OsuController {
                     play.statistics.count_50,
                     play.statistics.count_miss,
                     play.max_combo,
+                    await this.getBeatmapCombo(play.beatmap.id),
+                    play.beatmap.difficulty_rating,
                     play.pp,
                     play.rank,
                     play.score,
@@ -140,57 +129,27 @@ export class OsuController {
         return scores;
     }
 
-    // private async getAuthToken(req: Request, res: Response): Promise<void> {
-    //     const bodyParameters = {
-    //         client_id: Config.osu.id,
-    //         client_secret: Config.osu.secret,
-    //         grant_type: 'client_credentials',
-    //         scope: 'public',
-    //     };
+    public async getBeatmapCombo(beatmapId: string): Promise<number> {
+        const token = await this.getAuthToken();
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
+        };
+        const beatmap = await axios.get(
+            `${this.osuEndpoint}/beatmaps/lookup?id=${beatmapId}`,
+            config
+        );
+        return beatmap.data.max_combo;
+    }
 
-    //     try {
-    //         const token = await Token.findOne({ _id: 1 });
-    //         let resBody: GetAuthTokenResponse;
-    //         if (token.isExpired() || !token) {
-    //             const response = await axios.post('https://osu.ppy.sh/oauth/token', bodyParameters);
-    //             resBody = {
-    //                 token: response.data.access_token,
-    //                 expirationTime:
-    //                     Number(response.data.expires_in) + Math.trunc(Date.now() / 1000),
-    //             };
-    //             const newToken = new Token({
-    //                 _id: 1,
-    //                 token: resBody.token,
-    //                 expirationTime: resBody.expirationTime,
-    //             });
-    //             await newToken.save();
-    //             res.status(200).json(resBody);
-    //         } else {
-    //             resBody = {
-    //                 token: token.token,
-    //                 expirationTime: token.expirationTime,
-    //             };
-    //             res.status(200).json(resBody);
-    //         }
-    //     } catch (err) {
-    //         //TODO: maybe get better error handling/message/custom error here?
-    //         res.status(500).send('Error getting access token');
-    //     }
-    // }
-
-    //TODO: ask scott idk how this works
-    // private async getUser(req: Request, res: Response): Promise<void> {
-    //     let reqBody: GetOsuUserRequest = res.locals.input;
-
-    //     try {
-    //         const { data } = await this.localApi.get('/osu/auth-token');
-    //         const authToken = data.token;
-    //         const config = {
-    //             headers: { Authorization: `Bearer ${authToken}` },
-    //         };
-    //         console.log(reqBody);
-    //     } catch (err) {
-    //         console.log(err);
-    //     }
-    // }
+    public async getBeatmapDifficulty(beatmapId: string): Promise<number> {
+        const token = await this.getAuthToken();
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
+        };
+        const beatmap = await axios.get(
+            `${this.osuEndpoint}/beatmaps/lookup?id=${beatmapId}`,
+            config
+        );
+        return beatmap.data.difficulty_rating;
+    }
 }

@@ -3,6 +3,7 @@ import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { OsuController } from '../../controllers/osu-controller.js';
+import { OsuMod } from '../../enums/index.js';
 import { OsuScoreDTO } from '../../models/data-objects/index.js';
 import { OsuScore, Player, PpMatch } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
@@ -44,6 +45,11 @@ export class PpSubmitPlayCommand implements Command {
             return;
         }
 
+        if (play.mode !== 'osu') {
+            await InteractionUtils.send(intr, 'This play is not in osu! standard!');
+            return;
+        }
+
         if (play.status !== 'ranked' && play.status !== 'approved') {
             await InteractionUtils.send(intr, 'This beatmap is not ranked!');
             return;
@@ -78,6 +84,8 @@ export class PpSubmitPlayCommand implements Command {
             count50: play.count50,
             countMiss: play.countMiss,
             maxCombo: play.maxCombo,
+            beatmapMaxCombo: await osuController.getBeatmapCombo(play.beatmapId),
+            difficulty: play.difficulty,
             pp: pp,
             rank: play.rank,
             score: play.score,
@@ -151,6 +159,14 @@ export class PpSubmitPlayCommand implements Command {
                     ephemeral: true,
                 });
                 return;
+            }
+        }
+
+        if (score.mods.includes(OsuMod.EZ)) {
+            if (score.mods.includes(OsuMod.DT) || score.mods.includes(OsuMod.NC)) {
+                score.pp *= 1.25;
+            } else {
+                score.pp *= 1.5;
             }
         }
 

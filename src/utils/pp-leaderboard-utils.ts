@@ -17,18 +17,13 @@ export class PpLeaderboardUtils {
         });
 
         const mods = score.mods.length > 0 ? score.mods.join('') : 'NM';
-        if (mods.includes('EZ')) {
-            if (mods.includes('DT') || mods.includes('NC')) {
-                score.pp *= 1.25;
-            } else {
-                score.pp *= 1.5;
-            }
-        }
 
         scoreEmbed
             .addFields({
-                name: `${score.title} [${score.version}] +**${mods}**`,
-                value: `${score.pp.toFixed(2)} pp for ${(score.accuracy * 100).toFixed(2)}%`,
+                name: `${score.title} [${score.version}] [*${score.difficulty}*\\*] +**${mods}**`,
+                value: `${score.pp.toFixed(2)} pp for ${(score.accuracy * 100).toFixed(2)}% (**${
+                    score.maxCombo
+                }**x/${score.beatmapMaxCombo}x)`,
             })
             .setThumbnail(score.list);
 
