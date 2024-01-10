@@ -145,6 +145,14 @@ export class PpSubmitPlayCommand implements Command {
 
         const oldScore = PpLeaderboardUtils.getMapOnLeaderbaord(currLeaderboard, score.beatmapId);
 
+        if (score.mods.includes(OsuMod.EZ)) {
+            if (score.mods.includes(OsuMod.DT) || score.mods.includes(OsuMod.NC)) {
+                score.pp *= 1.25;
+            } else {
+                score.pp *= 1.5;
+            }
+        }
+
         if (oldScore) {
             if (oldScore.pp < score.pp) {
                 currLeaderboard.scores.splice(currLeaderboard.scores.indexOf(oldScore), 1);
@@ -159,14 +167,6 @@ export class PpSubmitPlayCommand implements Command {
                     ephemeral: true,
                 });
                 return;
-            }
-        }
-
-        if (score.mods.includes(OsuMod.EZ)) {
-            if (score.mods.includes(OsuMod.DT) || score.mods.includes(OsuMod.NC)) {
-                score.pp *= 1.25;
-            } else {
-                score.pp *= 1.5;
             }
         }
 
