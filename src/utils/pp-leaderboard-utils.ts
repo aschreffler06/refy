@@ -20,7 +20,9 @@ export class PpLeaderboardUtils {
 
         scoreEmbed
             .addFields({
-                name: `${score.title} [${score.version}] [*${score.difficulty}*\\*] +**${mods}**`,
+                name: `${score.title} [${score.version}] [${score.difficulty.toFixed(
+                    2
+                )}*] +**${mods}**`,
                 value: `${score.pp.toFixed(2)} pp for ${(score.accuracy * 100).toFixed(2)}% (**${
                     score.maxCombo
                 }**x/${score.beatmapMaxCombo}x)`,

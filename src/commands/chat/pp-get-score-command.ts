@@ -30,6 +30,10 @@ export class PpGetScoreCommand implements Command {
 
         const currLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, leaderboards);
         const score = PpLeaderboardUtils.getMapOnLeaderbaord(currLeaderboard, args.id);
+        if (!score) {
+            await InteractionUtils.send(intr, 'Score not found!');
+            return;
+        }
         const scoreEmbed = PpLeaderboardUtils.createScoreEmbed(player, score);
 
         await InteractionUtils.send(intr, scoreEmbed);

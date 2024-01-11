@@ -109,7 +109,7 @@ export class OsuController {
                     play.statistics.count_miss,
                     play.max_combo,
                     await this.getBeatmapCombo(play.beatmap.id),
-                    play.beatmap.difficulty_rating,
+                    await this.getBeatmapModdedDifficulty(play.beatmap.id, play.mods),
                     play.pp,
                     play.rank,
                     play.score,
@@ -151,5 +151,18 @@ export class OsuController {
             config
         );
         return beatmap.data.difficulty_rating;
+    }
+
+    public async getBeatmapModdedDifficulty(beatmapId: string, mods: string[]): Promise<number> {
+        const token = await this.getAuthToken();
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
+        };
+        const beatmap = await axios.post(
+            `${this.osuEndpoint}/beatmaps/${beatmapId}/attributes`,
+            { mods: mods },
+            config
+        );
+        return beatmap.data.attributes.star_rating;
     }
 }

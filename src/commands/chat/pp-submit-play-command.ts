@@ -84,7 +84,7 @@ export class PpSubmitPlayCommand implements Command {
             count50: play.count50,
             countMiss: play.countMiss,
             maxCombo: play.maxCombo,
-            beatmapMaxCombo: await osuController.getBeatmapCombo(play.beatmapId),
+            beatmapMaxCombo: play.beatmapMaxCombo,
             difficulty: play.difficulty,
             pp: pp,
             rank: play.rank,
@@ -154,17 +154,19 @@ export class PpSubmitPlayCommand implements Command {
         }
 
         if (oldScore) {
+            const oldPlayer = await Player.findOne({ _id: oldScore.userId }).exec();
             if (oldScore.pp < score.pp) {
                 currLeaderboard.scores.splice(currLeaderboard.scores.indexOf(oldScore), 1);
                 await InteractionUtils.send(intr, {
                     content: `You've just sniped this score!`,
                     ephemeral: true,
-                    embeds: [PpLeaderboardUtils.createScoreEmbed(player, oldScore)],
+                    embeds: [PpLeaderboardUtils.createScoreEmbed(oldPlayer, oldScore)],
                 });
             } else {
                 await InteractionUtils.send(intr, {
-                    content: 'There is already a score on this map worth more pp.',
+                    content: 'Sorry but this score is already worth more pp.',
                     ephemeral: true,
+                    embeds: [PpLeaderboardUtils.createScoreEmbed(oldPlayer, oldScore)],
                 });
                 return;
             }
