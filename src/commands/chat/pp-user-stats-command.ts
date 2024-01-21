@@ -24,7 +24,6 @@ export class PpUserStatsCommand implements Command {
         let teamPp = 0;
         let totalPlays = 0;
         for (let i = 0; i < scores.length && i < 100; i++) {
-            console.log(scores[i]);
             if (scores[i].userId == player.id) {
                 teamPp += scores[i].pp * Math.pow(0.95, i);
                 totalPlays += 1;
