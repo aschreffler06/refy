@@ -21,6 +21,7 @@ import {
     PpGetScoreCommand,
     PpJoinTeamCommand,
     PpSubmitPlayCommand,
+    PpUserStatsCommand,
     TestCommand,
 } from './commands/chat/index.js';
 import {
@@ -100,6 +101,7 @@ async function start(): Promise<void> {
         new PpGetScoreCommand(),
         new PpJoinTeamCommand(),
         new PpSubmitPlayCommand(),
+        new PpUserStatsCommand(),
 
         // Message Context Commands
         new ViewDateSent(),

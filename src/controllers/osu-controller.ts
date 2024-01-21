@@ -91,11 +91,13 @@ export class OsuController {
             headers: { Authorization: `Bearer ${token}` },
         };
         const osu = await Player.findOne({ discord: discordId }).exec();
+        console.log(`about to start osu api call`);
         const osuId = osu._id;
         const recentPlays = await axios.get(
             `${this.osuEndpoint}/users/${osuId}/scores/recent?limit=25`,
             config
         );
+        console.log(recentPlays.data);
         const scores: OsuScoreDTO[] = [];
         for (const play of recentPlays.data) {
             scores.push(

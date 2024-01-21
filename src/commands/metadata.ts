@@ -235,6 +235,13 @@ export const ChatCommandMetadata: {
             },
         ],
     },
+    PP_USER_STATS: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppUserStats', Language.Default),
+        description: Lang.getRef('commandDescs.ppUserStats', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+    },
 };
 
 export const MessageCommandMetadata: {

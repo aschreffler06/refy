@@ -210,7 +210,8 @@
             "ppDisplay": "pp-display",
             "ppGetScore": "pp-get-score",
             "ppJoinTeam": "pp-join-team",
-            "ppSubmitPlay": "pp-submit-play"
+            "ppSubmitPlay": "pp-submit-play",
+            "ppUserStats": "pp-user-stats"
         },
         "userCommands": {
             "viewDateJoined": "View Date Joined"
@@ -247,6 +248,7 @@
             "ppGetScore": "Given an osu beatmap id, get the current leaderboard score for that map",
             "ppJoinTeam": "Join a team for the leaderboard showdown.",
             "ppSubmitPlay": "Submit a play for the leaderboard for your team.",
+            "ppUserStats": "View your total plays and pp contributed",
             "link": "Link your osu account"
         },
         "argDescs": {

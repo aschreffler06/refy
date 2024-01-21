@@ -16,3 +16,4 @@ export { PpDisplayCommand } from './pp-display-command.js';
 export { PpGetScoreCommand } from './pp-get-score-command.js';
 export { PpJoinTeamCommand } from './pp-join-team-command.js';
 export { PpSubmitPlayCommand } from './pp-submit-play-command.js';
+export { PpUserStatsCommand } from './pp-user-stats-command.js';

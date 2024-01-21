@@ -47,7 +47,7 @@ export class PpDisplayCommand implements Command {
         for (const [teamName, scores] of teamMap) {
             scores.sort((a, b) => b - a);
             let teamPp = 0;
-            for (let i = 0; i < scores.length; i++) {
+            for (let i = 0; i < 100 && i < scores.length; i++) {
                 teamPp += scores[i] * Math.pow(0.95, i);
             }
             teamPpMap.set(teamName, teamPp);
