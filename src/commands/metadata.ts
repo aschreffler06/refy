@@ -196,6 +196,13 @@ export const ChatCommandMetadata: {
         //     },
         // ],
     },
+    PP_DISPLAY_TOTAL: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppDisplayTotal', Language.Default),
+        description: Lang.getRef('commandDescs.ppDisplayTotal', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+    },
     PP_GET_SCORE: {
         type: ApplicationCommandType.ChatInput,
         name: Lang.getRef('chatCommands.ppGetScore', Language.Default),

@@ -13,6 +13,7 @@ export { PpCreateLeaderboardCommand } from './pp-create-leaderboard-command.js';
 export { PpCreateMatchCommand } from './pp-create-match-command.js';
 export { PpCreateTeamCommand } from './pp-create-team-command.js';
 export { PpDisplayCommand } from './pp-display-command.js';
+export { PpDisplayTotalCommand } from './pp-display-total-command.js';
 export { PpGetScoreCommand } from './pp-get-score-command.js';
 export { PpJoinTeamCommand } from './pp-join-team-command.js';
 export { PpSubmitPlayCommand } from './pp-submit-play-command.js';

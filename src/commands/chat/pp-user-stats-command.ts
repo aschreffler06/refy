@@ -27,13 +27,11 @@ export class PpUserStatsCommand implements Command {
                 break;
             }
         }
-        console.log(teamName);
         scores = scores.filter(score => score.teamName === teamName).sort((a, b) => b.pp - a.pp);
         let totalPp = 0;
         let totalPlays = 0;
         for (let i = 0; i < scores.length && i < 100; i++) {
             if (scores[i].userId == player.id) {
-                console.log(scores[i].userId, scores[i].pp, i);
                 totalPp += scores[i].pp * Math.pow(0.95, i);
                 totalPlays += 1;
             }
