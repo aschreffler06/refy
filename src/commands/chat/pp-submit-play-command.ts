@@ -38,12 +38,15 @@ export class PpSubmitPlayCommand implements Command {
                 `You don't have that many recent plays! (Does not include fails)`
             );
         }
-
-        //TODO: write this better
-        if (play.createdAt < 1704502800 || play.createdAt > 1705978800) {
-            InteractionUtils.send(intr, 'This play is not in the time range!');
-            return;
+        if (intr.guildId == '1168932770039468042') {
+            await InteractionUtils.send(intr, 'FFSF is over nice try');
         }
+        //TODO: write this better
+
+        // if (play.createdAt < 1704502800 || play.createdAt > 1705978800) {
+        //     InteractionUtils.send(intr, 'This play is not in the time range!');
+        //     return;
+        // }
 
         if (play.mode !== 'osu') {
             await InteractionUtils.send(intr, 'This play is not in osu! standard!');
