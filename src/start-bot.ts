@@ -4,12 +4,12 @@ import { createRequire } from 'node:module';
 
 import { Button } from './buttons/index.js';
 import {
+    AuctionBalanceCommand,
     AuctionDisplayCommand,
     AuctionSaleCommand,
     AuctionSetupCommand,
-    AuctionShowCashCommand,
-    AuctionShowItemsCommand,
     AuctionStartCommand,
+    AuctionTeamCommand,
     CreateTicketCommand,
     HelpCommand,
     InfoCommand,
@@ -87,12 +87,12 @@ async function start(): Promise<void> {
         new InfoCommand(),
         new TestCommand(),
 
+        new AuctionBalanceCommand(),
         new AuctionDisplayCommand(),
         new AuctionSaleCommand(),
         new AuctionSetupCommand(),
-        new AuctionShowCashCommand(),
-        new AuctionShowItemsCommand(),
         new AuctionStartCommand(),
+        new AuctionTeamCommand(),
         new CreateTicketCommand(),
         new LinkCommand(),
         new PpCreateLeaderboardCommand(),

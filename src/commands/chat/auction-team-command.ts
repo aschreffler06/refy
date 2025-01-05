@@ -8,8 +8,8 @@ import { Lang } from '../../services/index.js';
 import { InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 
-export class AuctionShowItemsCommand implements Command {
-    public names = [Lang.getRef('chatCommands.auctionShowItems', Language.Default)];
+export class AuctionTeamCommand implements Command {
+    public names = [Lang.getRef('chatCommands.auctionTeam', Language.Default)];
     public cooldown = new RateLimiter(1, 5000);
     public deferType = CommandDeferType.PUBLIC;
     public requireClientPerms: PermissionsString[] = [];

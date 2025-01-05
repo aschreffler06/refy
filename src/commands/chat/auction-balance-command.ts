@@ -8,8 +8,8 @@ import { Lang } from '../../services/index.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../index.js';
 
-export class AuctionShowCashCommand implements Command {
-    public names = [Lang.getRef('chatCommands.auctionShowCash', Language.Default)];
+export class AuctionBalanceCommand implements Command {
+    public names = [Lang.getRef('chatCommands.auctionBalance', Language.Default)];
     public cooldown = new RateLimiter(1, 5000);
     public deferType = CommandDeferType.PUBLIC;
     public requireClientPerms: PermissionsString[] = [];
@@ -33,7 +33,7 @@ export class AuctionShowCashCommand implements Command {
             const cash = auction.getCash(intr.user.id);
             cashEmbed = new EmbedBuilder()
                 .setTitle(`Viewing ${intr.user.username}'s Cash`)
-                .addFields({ name: 'Cash', value: cash.toString() });
+                .addFields({ name: 'Cash', value: '$' + cash.toFixed(2).toString() });
         }
 
         await InteractionUtils.send(intr, cashEmbed);

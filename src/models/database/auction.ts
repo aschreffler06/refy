@@ -8,10 +8,37 @@ interface IBidder {
     items: string[];
 }
 
+interface IAuctionPlayer {
+    _id: string;
+    name: string;
+    seed: number;
+    rank: number;
+    description: string;
+    averageScore: number;
+    bestMap: string;
+    bestMapRank: string;
+    bestMapScore: number;
+    avatar: string;
+}
+
 const bidderSchema = new Schema<IBidder>({
     _id: { type: String, required: true },
     cash: { type: Number, required: true },
     items: { type: [String], required: true },
+});
+
+// PLAYERS
+const auctionPlayerScehma = new Schema<IAuctionPlayer>({
+    _id: { type: String, required: true },
+    name: { type: String, required: true },
+    seed: { type: Number, required: true },
+    rank: { type: Number, required: true },
+    description: { type: String, required: false },
+    averageScore: { type: Number, required: true },
+    bestMap: { type: String, required: true },
+    bestMapRank: { type: String, required: true },
+    bestMapScore: { type: Number, required: true },
+    avatar: { type: String, required: true },
 });
 
 interface IAuction {
@@ -19,6 +46,7 @@ interface IAuction {
     name: string;
     starting_cash: number;
     bidders: IBidder[];
+    players: IAuctionPlayer[];
 }
 
 // AUCTIONS
@@ -36,6 +64,7 @@ const auctionSchema = new Schema<IAuction, AuctionModelType, AuctionDocumentProp
     name: { type: String, required: true },
     starting_cash: { type: Number, required: true },
     bidders: { type: [bidderSchema], required: true },
+    players: { type: [auctionPlayerScehma], required: false },
 });
 
 auctionSchema.method('getCash', function getCash(this: IAuction, id: string): number {
@@ -61,6 +90,10 @@ auctionSchema.method('getItems', function getItems(this: IAuction, id: string): 
     } else {
         return [];
     }
+});
+
+auctionSchema.method('addPlayer', function addPlayer(this: IAuction, player: IAuctionPlayer): void {
+    this.players.push(player);
 });
 
 const Auction = model('Auction', auctionSchema);

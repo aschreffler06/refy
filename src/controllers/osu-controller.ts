@@ -55,8 +55,10 @@ export class OsuController {
         let user;
         try {
             if (id) {
+                console.log('Getting user with id: ', id);
                 user = await axios.get(`${this.osuEndpoint}/users/${id}/osu`, config);
             } else if (username) {
+                console.log('Getting user: ', username);
                 user = await axios.get(
                     `${this.osuEndpoint}/users/${username}/osu?key=username`,
                     config

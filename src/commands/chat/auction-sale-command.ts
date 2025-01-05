@@ -1,9 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { OsuController } from '../../controllers/osu-controller.js';
 import { Auction } from '../../models/database/auction.js';
-import { Player } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
@@ -25,41 +23,47 @@ export class AuctionSaleCommand implements Command {
             name: intr.options.getString(Lang.getRef('arguments.name', Language.Default)),
         };
 
-        let auctioned = await Player.findOne({ username: args.name });
+        let auction = await Auction.findOne({ guild_id: intr.guildId }).exec();
+
+        // let auctioned = await Player.findOne({ username: args.name });
+        let auctioned = auction.players.find(player => player.name === args.name);
         if (!auctioned) {
             // await InteractionUtils.send(
             //     intr,
             //     `Now starting the bidding for ${args.name}! (no embed since they didn't link their account lol!)`
             // );
-            const osuController = new OsuController();
-            let userInfo = await osuController.getUser({ username: args.name });
-            auctioned = new Player({
-                _id: userInfo.id,
-                username: userInfo.username,
-                rank: userInfo.rank,
-                accuracy: userInfo.accuracy,
-                badges: userInfo.badges,
-                level: userInfo.level,
-                playCount: userInfo.playCount,
-                playTime: userInfo.playTime,
-                avatar: userInfo.avatar,
-            });
+            // const osuController = new OsuController();
+            // let userInfo = await osuController.getUser({ username: args.name });
+            // auctioned = new Player({
+            //     _id: userInfo.id,
+            //     username: userInfo.username,
+            //     rank: userInfo.rank,
+            //     accuracy: userInfo.accuracy,
+            //     badges: userInfo.badges,
+            //     level: userInfo.level,
+            //     playCount: userInfo.playCount,
+            //     playTime: userInfo.playTime,
+            //     avatar: userInfo.avatar,
+            // });
         }
         const playerEmbed = new EmbedBuilder()
             .setTitle(`Now starting the bidding for ${args.name}!`)
-            .setDescription(`Here's a quick overview of their profile.`)
             .addFields(
+                { name: 'Seed', value: auctioned.seed.toString(), inline: true },
                 { name: 'Rank', value: auctioned.rank.toString(), inline: true },
-                { name: 'Accuracy', value: auctioned.accuracy.toString(), inline: true },
-                { name: 'Badges', value: auctioned.badges.toString(), inline: true },
-                { name: 'Level', value: auctioned.level.toString(), inline: true },
-                { name: 'Play Count', value: auctioned.playCount.toString(), inline: true },
-                { name: 'Play Time', value: auctioned.playTime.toString(), inline: true }
+                { name: 'Current Bid', value: '$0', inline: true },
+                { name: 'Average Score', value: auctioned.averageScore.toString(), inline: true },
+                {
+                    name: 'Best Map',
+                    value: `${auctioned.bestMap.toString()} - ${auctioned.bestMapScore.toString()}`,
+                    inline: true,
+                },
+                { name: 'Description', value: auctioned.description.toString() }
             )
             //TODO: add top 3 plays
             .setThumbnail(auctioned.avatar);
 
-        await InteractionUtils.send(intr, playerEmbed);
+        const embed = await InteractionUtils.send(intr, playerEmbed);
 
         const bidCollector = intr.channel.createMessageCollector({ time: 15000 });
 
@@ -68,23 +72,74 @@ export class AuctionSaleCommand implements Command {
 
         bidCollector.on('collect', async m => {
             switch (true) {
-                case /^bid [$]\d{1,3}$/.test(m.content): {
+                case /^bid [$]\d{1,2}(\.\d{1,2})?/.test(m.content): {
                     bidCollector.resetTimer({ time: 15000 });
-                    const bid = parseInt(m.content.split('$')[1]);
+                    const bid = parseFloat(m.content.split('$')[1]);
                     if (!isBidValid(bid)) {
                         await InteractionUtils.send(
                             intr,
-                            `<@${m.author.id}> Bid must be a multiple of $25 and between $25 and $575`
+                            `<@${m.author.id}> Bid must be a multiple of $0.50 and between $0.50 and $11.50`
                         );
                         return;
                     }
                     if (bid > highestBid) {
+                        if (highestBidder == m.author.id) {
+                            await InteractionUtils.send(
+                                intr,
+                                `<@${m.author.id}> Outbidding yourself in this economy?`
+                            );
+                            return;
+                        }
+                        if (auction.getCash(m.author.id) < bid) {
+                            await InteractionUtils.send(
+                                intr,
+                                `<@${m.author.id}> You are too poor. Great depression hitting hard`
+                            );
+                            return;
+                        }
                         highestBid = bid;
                         highestBidder = m.author.id;
                         await InteractionUtils.send(
                             intr,
-                            `<@${m.author.id}> is now the highest bidder with a bid of $${bid}`
+                            `<@${
+                                m.author.id
+                            }> is now the highest bidder with a bid of $${bid.toFixed(2)}`
                         );
+                        embed.edit({
+                            embeds: [
+                                playerEmbed.setFields([
+                                    {
+                                        name: 'Seed',
+                                        value: auctioned.seed.toString(),
+                                        inline: true,
+                                    },
+                                    {
+                                        name: 'Rank',
+                                        value: auctioned.rank.toString(),
+                                        inline: true,
+                                    },
+                                    {
+                                        name: 'Current Bid',
+                                        value: `<@${m.author.id}> - $` + highestBid.toFixed(2),
+                                        inline: true,
+                                    },
+                                    {
+                                        name: 'Average Score',
+                                        value: auctioned.averageScore.toString(),
+                                        inline: true,
+                                    },
+                                    {
+                                        name: 'Best Map',
+                                        value: `${auctioned.bestMap.toString()} - ${auctioned.bestMapScore.toString()}`,
+                                        inline: true,
+                                    },
+                                    {
+                                        name: 'Description',
+                                        value: auctioned.description.toString(),
+                                    },
+                                ]),
+                            ],
+                        });
                     }
                     break;
                 }
@@ -98,7 +153,9 @@ export class AuctionSaleCommand implements Command {
             } else {
                 await InteractionUtils.send(
                     intr,
-                    `Bidding ended! <@${highestBidder}> won with a bid of $${highestBid}!`
+                    `Bidding ended! <@${highestBidder}> won with a bid of $${highestBid.toFixed(
+                        2
+                    )}!`
                 );
                 //TODO: for now we assume that only one auction is available per server
                 const auction = await Auction.findOne({ guild_id: intr.guildId }).exec();
@@ -113,5 +170,5 @@ export class AuctionSaleCommand implements Command {
 }
 
 function isBidValid(bid: number): boolean {
-    return bid % 25 === 0 && bid >= 25 && bid <= 575;
+    return bid % 0.5 === 0 && bid >= 0.5 && bid <= 11.5;
 }

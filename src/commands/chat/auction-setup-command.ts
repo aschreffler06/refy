@@ -4,6 +4,8 @@
 
 //TODO: find the bug that causes the model to not submit (still goes into db)
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { parse } from 'csv-parse';
 import {
     ButtonStyle,
     CacheType,
@@ -16,14 +18,22 @@ import {
 } from 'discord.js';
 import { CollectorUtils } from 'discord.js-collector-utils';
 import { RateLimiter } from 'discord.js-rate-limiter';
+import * as fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+import { OsuController } from '../../controllers/osu-controller.js';
 import { UserNotInGuildError } from '../../error/index.js';
+import { OsuUserInfoDTO } from '../../models/data-objects/index.js';
 import { Auction } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
 import { InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
+
+const __fileName = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__fileName);
 
 export class AuctionSetupCommand implements Command {
     public names = [Lang.getRef('chatCommands.auctionSetup', Language.Default)];
@@ -39,6 +49,7 @@ export class AuctionSetupCommand implements Command {
             );
             return;
         }
+        const players = await readPlayers();
         const auctionCreatePrompt = await InteractionUtils.send(
             intr,
             {
@@ -99,7 +110,7 @@ export class AuctionSetupCommand implements Command {
                                 type: ComponentType.TextInput,
                                 customId: 'bidders',
                                 label: 'Bidders',
-                                placeholder: 'Input bidders discord tags separated by commas',
+                                placeholder: 'Input bidders discord ids  separated by commas',
                                 style: TextInputStyle.Paragraph,
                                 required: true,
                                 minLength: 1,
@@ -118,15 +129,6 @@ export class AuctionSetupCommand implements Command {
                     startingCash.type !== ComponentType.TextInput ||
                     bidders.type !== ComponentType.TextInput
                 ) {
-                    return;
-                }
-
-                if (Number(startingCash.value) % 25 !== 0) {
-                    await InteractionUtils.send(
-                        modalSubmitInteraction,
-                        'Starting cash must be a multiple of 25. Please rerun the command and choose a different starting cash.',
-                        true
-                    );
                     return;
                 }
 
@@ -174,6 +176,7 @@ export class AuctionSetupCommand implements Command {
             name: auctionCreateResult.value.name,
             starting_cash: auctionCreateResult.value.startingCash,
             bidders: bidders,
+            players: players,
         });
 
         await auction.save();
@@ -197,4 +200,67 @@ async function cleanBidders(
         }
     }
     return biddersList;
+}
+
+async function readPlayers(): Promise<string[][]> {
+    //PLAYER STUFF ITS HARDCODED WITH A CSV YEP HAHAHAA
+    const csvFilePath = path.resolve(__dirname, '../../../AAAH3Quals.csv');
+
+    const headers = [
+        'seed',
+        'username',
+        'id',
+        'rank',
+        'description',
+        'averagescore',
+        'bestmap',
+        'bestmaprank',
+        'bestmapscore',
+    ];
+
+    const fileContent = fs.readFileSync(csvFilePath, 'utf8');
+    let players = [];
+    await new Promise<void>((resolve, reject) => {
+        parse(
+            fileContent,
+            {
+                delimiter: ',',
+                columns: headers,
+            },
+            (error: any, result: string[][]) => {
+                if (error) {
+                    console.error(error);
+                    reject(error);
+                    return;
+                }
+                players = result.map(player => {
+                    return {
+                        _id: player['id'],
+                        name: player['username'],
+                        seed: parseInt(player['seed']),
+                        rank: parseInt(player['rank']),
+                        description: player['description'],
+                        averageScore: parseInt(player['averagescore']),
+                        bestMap: player['bestmap'],
+                        bestMapRank: player['bestmaprank'],
+                        bestMapScore: parseInt(player['bestmapscore']),
+                    };
+                });
+                resolve();
+            }
+        );
+    });
+    console.log(players);
+
+    const osuController = new OsuController();
+    for (let i = 0; i < players.length; i++) {
+        const player = players[i];
+        const userInfo: OsuUserInfoDTO = await osuController.getUser({
+            username: player['name'],
+        });
+        player['avatar'] = userInfo.avatar;
+        console.log(player);
+    }
+
+    return players;
 }

@@ -46,7 +46,7 @@ export class AuctionStartCommand implements Command {
         const startEmbed = new EmbedBuilder()
             .setTitle(`Auction '${auctionName}' will begin shortly!`)
             .setDescription(
-                `Bidding minimum is $25, maximum is $575, and you can only bid in values divisible by $25.\nYou will have 15 seconds for the first bid, and every bid will reset the timer to 10 seconds.\n To bid you need to type \`bid $<number>\``
+                `Bidding minimum is $0.50, maximum is $11.50, and you can only bid in values divisible by $0.50.\nYou will have 15 seconds for the first bid, and every bid will reset the timer to 10 seconds.\n To bid you need to type \`bid $<number>\``
             )
             .setColor(0xff0000)
             .setAuthor({
