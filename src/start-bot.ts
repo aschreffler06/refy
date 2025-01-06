@@ -4,15 +4,15 @@ import { createRequire } from 'node:module';
 
 import { Button } from './buttons/index.js';
 import {
-    AuctionBalanceCommand,
-    AuctionDisplayCommand,
-    AuctionSaleCommand,
-    AuctionSetupCommand,
-    AuctionStartCommand,
-    AuctionTeamCommand,
-    CreateTicketCommand,
-    HelpCommand,
-    InfoCommand,
+    // AuctionBalanceCommand,
+    // AuctionDisplayCommand,
+    // AuctionSaleCommand,
+    // AuctionSetupCommand,
+    // AuctionStartCommand,
+    // AuctionTeamCommand,
+    // CreateTicketCommand,
+    // HelpCommand,
+    // InfoCommand,
     LinkCommand,
     PpCreateLeaderboardCommand,
     PpCreateMatchCommand,
@@ -23,7 +23,7 @@ import {
     PpJoinTeamCommand,
     PpSubmitPlayCommand,
     PpUserStatsCommand,
-    TestCommand,
+    // TestCommand,
 } from './commands/chat/index.js';
 import {
     ChatCommandMetadata,
@@ -83,17 +83,17 @@ async function start(): Promise<void> {
     // Commands
     let commands: Command[] = [
         // Chat Commands
-        new HelpCommand(),
-        new InfoCommand(),
-        new TestCommand(),
+        // new HelpCommand(),
+        // new InfoCommand(),
+        // new TestCommand(),
 
-        new AuctionBalanceCommand(),
-        new AuctionDisplayCommand(),
-        new AuctionSaleCommand(),
-        new AuctionSetupCommand(),
-        new AuctionStartCommand(),
-        new AuctionTeamCommand(),
-        new CreateTicketCommand(),
+        // new AuctionBalanceCommand(),
+        // new AuctionDisplayCommand(),
+        // new AuctionSaleCommand(),
+        // new AuctionSetupCommand(),
+        // new AuctionStartCommand(),
+        // new AuctionTeamCommand(),
+        // new CreateTicketCommand(),
         new LinkCommand(),
         new PpCreateLeaderboardCommand(),
         new PpCreateMatchCommand(),

@@ -17,6 +17,7 @@ export class PpCreateMatchCommand implements Command {
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
         if ((await PpMatch.find({ guildId: intr.guildId }).count()) > 0) {
             await InteractionUtils.send(intr, `A match for this guild is already in progress!`);
+            console.log(await PpMatch.find({ guildId: intr.guildId }));
             return;
         }
 
