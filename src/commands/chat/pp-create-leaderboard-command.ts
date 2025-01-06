@@ -15,7 +15,9 @@ export class PpCreateLeaderboardCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
-        const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
+        //TODO: MAKE NOT NAME HARDCODED
+        const match = await PpMatch.findOne({ name: 'AESA' }).exec();
+        // const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
         if (!match) {
             await InteractionUtils.send(intr, `No match is currently in progress for this server.`);
             return;

@@ -19,7 +19,9 @@ export class PpGetScoreCommand implements Command {
             id: intr.options.getString(Lang.getRef('arguments.id', data.lang)),
         };
 
-        const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
+        //TODO: MAKE NOT NAME HARDCODED
+        const match = await PpMatch.findOne({ name: 'AESA' }).exec();
+        // const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
         if (!match) {
             await InteractionUtils.send(intr, 'Match not found!');
             return;

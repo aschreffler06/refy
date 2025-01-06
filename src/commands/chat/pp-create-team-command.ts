@@ -18,7 +18,9 @@ export class PpCreateTeamCommand implements Command {
         const args = {
             name: intr.options.getString(Lang.getRef('arguments.name', data.lang)),
         };
-        const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
+        //TODO: MAKE NOT NAME HARDCODED
+        const match = await PpMatch.findOne({ name: 'AESA' }).exec();
+        // const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
         if (!match) {
             await InteractionUtils.send(intr, `No match is currently in progress for this server.`);
             return;

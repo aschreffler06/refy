@@ -38,20 +38,17 @@ export class PpSubmitPlayCommand implements Command {
                 `You don't have that many recent plays! (Does not include fails)`
             );
         }
-        if (intr.guildId == '1168932770039468042') {
-            await InteractionUtils.send(intr, 'FFSF is over nice try');
-        }
         //TODO: write this better
 
-        // if (play.createdAt < 1704502800 || play.createdAt > 1705978800) {
-        //     InteractionUtils.send(intr, 'This play is not in the time range!');
-        //     return;
-        // }
-
-        if (play.mode !== 'osu') {
-            await InteractionUtils.send(intr, 'This play is not in osu! standard!');
+        if (play.createdAt < 1736136000 || play.createdAt > 1737860400) {
+            InteractionUtils.send(intr, 'This play is not in the time range!');
             return;
         }
+
+        // if (play.mode !== 'osu') {
+        //     await InteractionUtils.send(intr, 'This play is not in osu! standard!');
+        //     return;
+        // }
 
         if (play.status !== 'ranked' && play.status !== 'approved') {
             await InteractionUtils.send(intr, 'This beatmap is not ranked!');
@@ -121,7 +118,9 @@ export class PpSubmitPlayCommand implements Command {
             }
         }
 
-        const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
+        //TODO: MAKE NOT NAME HARDCODED
+        const match = await PpMatch.findOne({ name: 'AESA' }).exec();
+        // const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
 
         //TODO: generalize error messages for things like this
         if (!match) {
@@ -142,7 +141,14 @@ export class PpSubmitPlayCommand implements Command {
         score.teamName = team.name;
 
         const leaderboards = match.leaderboards;
-        let currLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, leaderboards);
+        let currLeaderboard;
+        if (play.mode !== 'osu') {
+            // await InteractionUtils.send(intr, 'This play is not in osu! standard!');
+            // return;
+            currLeaderboard = leaderboards[-1];
+        } else {
+            currLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, leaderboards);
+        }
 
         // find if there is any score that matches the same map
 

@@ -15,7 +15,9 @@ export class PpUserStatsCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, _data: EventData): Promise<void> {
-        const match = await PpMatch.findOne({ guildId: intr.guildId });
+        //TODO: MAKE NOT NAME HARDCODED
+        const match = await PpMatch.findOne({ name: 'AESA' }).exec();
+        // const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
         const player = await Player.findOne({ discord: intr.user.id }).exec();
         const leaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, match.leaderboards);
 
