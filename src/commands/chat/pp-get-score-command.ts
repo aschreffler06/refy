@@ -36,7 +36,7 @@ export class PpGetScoreCommand implements Command {
             await InteractionUtils.send(intr, 'Score not found!');
             return;
         }
-        const scoreEmbed = PpLeaderboardUtils.createScoreEmbed(player, score);
+        const scoreEmbed = PpLeaderboardUtils.createScoreEmbed(player, score, currLeaderboard);
 
         await InteractionUtils.send(intr, scoreEmbed);
     }

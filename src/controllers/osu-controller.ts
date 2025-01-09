@@ -85,9 +85,13 @@ export class OsuController {
     /**
      * Does not include fails
      * @param discordId
+     * @param mode
      * @returns
      */
-    public async getRecentPlays(discordId: string): Promise<OsuScoreDTO[]> {
+    public async getRecentPlays(discordId: string, mode?: string): Promise<OsuScoreDTO[]> {
+        if (!mode) {
+            mode = 'osu';
+        }
         const token = await this.getAuthToken();
         const config = {
             headers: { Authorization: `Bearer ${token}` },
@@ -95,7 +99,7 @@ export class OsuController {
         const osu = await Player.findOne({ discord: discordId }).exec();
         const osuId = osu._id;
         const recentPlays = await axios.get(
-            `${this.osuEndpoint}/users/${osuId}/scores/recent?limit=25`,
+            `${this.osuEndpoint}/users/${osuId}/scores/recent?limit=25&mode=${mode}`,
             config
         );
         const scores: OsuScoreDTO[] = [];

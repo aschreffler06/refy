@@ -9,12 +9,31 @@ export class PpLeaderboardUtils {
      * @param score
      * @returns
      */
-    public static createScoreEmbed(player: IPlayer, score: IOsuScore): EmbedBuilder {
-        let scoreEmbed = new EmbedBuilder().setTitle('Score').setAuthor({
-            name: player.username + ' | ' + score.teamName,
+    public static createScoreEmbed(
+        player: IPlayer,
+        score: IOsuScore,
+        leaderboard: IPpLeaderboard,
+        oldPp?: number,
+        newPp?: number
+    ): EmbedBuilder {
+        // look for the score in the leaderboard and grab index
+        const scoreNumber =
+            leaderboard.scores
+                .filter(s => s.teamName === score.teamName)
+                .sort((a, b) => b.pp - a.pp)
+                .findIndex(s => s._id === score._id) + 1;
+
+        let scoreEmbed = new EmbedBuilder().setTitle(`Score #${scoreNumber}`).setAuthor({
+            name: `${player.username} | ${score.teamName} ${leaderboard.lowerRank} - ${leaderboard.upperRank}`,
             iconURL: player.avatar,
             url: `https://osu.ppy.sh/users/${player._id}`,
         });
+
+        if (oldPp && newPp) {
+            scoreEmbed.setTitle(
+                `Score #${scoreNumber} | ${oldPp.toFixed(2)}pp -> ${newPp.toFixed(2)}pp`
+            );
+        }
 
         const mods = score.mods.length > 0 ? score.mods.join('') : 'NM';
 

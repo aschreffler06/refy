@@ -22,9 +22,10 @@ export class PpSubmitPlayCommand implements Command {
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
         const args = {
             recent: intr.options.getNumber(Lang.getRef('arguments.recent', data.lang)),
+            mode: intr.options.getString(Lang.getRef('arguments.mode', data.lang)),
         };
         const osuController = new OsuController();
-        const recentPlays = await osuController.getRecentPlays(intr.user.id);
+        const recentPlays = await osuController.getRecentPlays(intr.user.id, args.mode);
         const player = await Player.findOne({ discord: intr.user.id }).exec();
 
         let play: OsuScoreDTO;
@@ -145,6 +146,7 @@ export class PpSubmitPlayCommand implements Command {
         if (play.mode !== 'osu') {
             // await InteractionUtils.send(intr, 'This play is not in osu! standard!');
             // return;
+            console.log(score);
             currLeaderboard = leaderboards[-1];
         } else {
             currLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, leaderboards);
@@ -162,30 +164,78 @@ export class PpSubmitPlayCommand implements Command {
             }
         }
 
+        let allScores = currLeaderboard.scores
+            .filter(s => s.teamName === score.teamName)
+            .sort((a, b) => b.pp - a.pp);
+
+        allScores.sort((a, b) => b - a);
+        let oldPp = 0;
+        for (let i = 0; i < 100 && i < allScores.length; i++) {
+            let pp = allScores[i].pp * Math.pow(0.95, i);
+            oldPp += pp;
+        }
+
         if (oldScore) {
             const oldPlayer = await Player.findOne({ _id: oldScore.userId }).exec();
             if (oldScore.pp < score.pp) {
                 currLeaderboard.scores.splice(currLeaderboard.scores.indexOf(oldScore), 1);
+                currLeaderboard.scores.push(score);
+
+                let allScoresNew = currLeaderboard.scores
+                    .filter(s => s.teamName === score.teamName)
+                    .sort((a, b) => b.pp - a.pp);
+
+                allScores.sort((a, b) => b - a);
+                let newPp = 0;
+                for (let i = 0; i < 100 && i < allScoresNew.length; i++) {
+                    newPp += allScoresNew[i].pp * Math.pow(0.95, i);
+                }
+
                 await InteractionUtils.send(intr, {
                     content: `You've just sniped this score!`,
                     ephemeral: true,
-                    embeds: [PpLeaderboardUtils.createScoreEmbed(oldPlayer, oldScore)],
+                    embeds: [
+                        PpLeaderboardUtils.createScoreEmbed(
+                            oldPlayer,
+                            oldScore,
+                            currLeaderboard,
+                            oldPp,
+                            newPp
+                        ),
+                    ],
                 });
             } else {
                 await InteractionUtils.send(intr, {
                     content: 'Sorry but this score is already worth more pp.',
                     ephemeral: true,
-                    embeds: [PpLeaderboardUtils.createScoreEmbed(oldPlayer, oldScore)],
+                    embeds: [
+                        PpLeaderboardUtils.createScoreEmbed(oldPlayer, oldScore, currLeaderboard),
+                    ],
                 });
                 return;
             }
+        } else {
+            currLeaderboard.scores.push(score);
         }
+        let allScoresNew = currLeaderboard.scores
+            .filter(s => s.teamName === score.teamName)
+            .sort((a, b) => b.pp - a.pp);
 
-        currLeaderboard.scores.push(score);
+        allScores.sort((a, b) => b - a);
+        let newPp = 0;
+        for (let i = 0; i < 100 && i < allScoresNew.length; i++) {
+            newPp += allScoresNew[i].pp * Math.pow(0.95, i);
+        }
+        const scoreEmbed = PpLeaderboardUtils.createScoreEmbed(
+            player,
+            score,
+            currLeaderboard,
+            oldPp,
+            newPp
+        );
 
         await match.save();
 
-        const scoreEmbed = PpLeaderboardUtils.createScoreEmbed(player, score);
         await InteractionUtils.send(intr, { embeds: [scoreEmbed], ephemeral: false });
     }
 }

@@ -240,6 +240,10 @@ export const ChatCommandMetadata: {
                 ...Args.RECENT,
                 required: false,
             },
+            {
+                ...Args.MODE,
+                required: false,
+            },
         ],
     },
     PP_USER_STATS: {
