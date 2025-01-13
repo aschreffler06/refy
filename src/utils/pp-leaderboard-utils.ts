@@ -35,6 +35,14 @@ export class PpLeaderboardUtils {
             );
         }
 
+        if (leaderboard.lowerRank === leaderboard.upperRank) {
+            scoreEmbed.setAuthor({
+                name: `${player.username} | ${score.teamName} MM`,
+                iconURL: player.avatar,
+                url: `https://osu.ppy.sh/users/${player._id}`,
+            });
+        }
+
         const mods = score.mods.length > 0 ? score.mods.join('') : 'NM';
 
         scoreEmbed

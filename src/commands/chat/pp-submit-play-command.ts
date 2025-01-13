@@ -24,6 +24,9 @@ export class PpSubmitPlayCommand implements Command {
             recent: intr.options.getNumber(Lang.getRef('arguments.recent', data.lang)),
             mode: intr.options.getString(Lang.getRef('arguments.mode', data.lang)),
         };
+        if (!args.mode) {
+            args.mode = 'osu';
+        }
         const osuController = new OsuController();
         const recentPlays = await osuController.getRecentPlays(intr.user.id, args.mode);
         const player = await Player.findOne({ discord: intr.user.id }).exec();
@@ -59,18 +62,56 @@ export class PpSubmitPlayCommand implements Command {
         let pp;
         if (!play.pp) {
             const scoreCalculator = new ScoreCalculator();
+            let result;
+            if (args.mode === 'osu') {
+                result = await scoreCalculator.calculate({
+                    beatmapId: Number(play.beatmapId),
+                    mods: play.mods.join(''),
+                    accuracy: play.accuracy,
+                    count300: play.count300,
+                    count100: play.count100,
+                    count50: play.count50,
+                    countMiss: play.countMiss,
+                    maxCombo: play.maxCombo,
+                    rulesetId: 0,
+                });
+            } else if (args.mode === 'taiko') {
+                result = await scoreCalculator.calculate({
+                    beatmapId: Number(play.beatmapId),
+                    mods: play.mods.join(''),
+                    accuracy: play.accuracy,
+                    count300: play.count300,
+                    count100: play.count100,
+                    countMiss: play.countMiss,
+                    maxCombo: play.maxCombo,
+                    rulesetId: 1,
+                });
+            } else if (args.mode === 'fruits') {
+                result = await scoreCalculator.calculate({
+                    beatmapId: Number(play.beatmapId),
+                    mods: play.mods.join(''),
+                    accuracy: play.accuracy,
+                    count300: play.count300,
+                    count100: play.count100,
+                    count50: play.count50,
+                    countMiss: play.countMiss,
+                    maxCombo: play.maxCombo,
+                    rulesetId: 2,
+                });
+            } else if (args.mode === 'mania') {
+                result = await scoreCalculator.calculate({
+                    beatmapId: Number(play.beatmapId),
+                    mods: play.mods.join(''),
+                    accuracy: play.accuracy,
+                    count300: play.count300,
+                    count100: play.count100,
+                    count50: play.count50,
+                    countMiss: play.countMiss,
+                    maxCombo: play.maxCombo,
+                    rulesetId: 3,
+                });
+            }
 
-            const result = await scoreCalculator.calculate({
-                beatmapId: Number(play.beatmapId),
-                mods: play.mods.join(''),
-                accuracy: play.accuracy,
-                count300: play.count300,
-                count100: play.count100,
-                count50: play.count50,
-                countMiss: play.countMiss,
-                maxCombo: play.maxCombo,
-                rulesetId: 0,
-            });
             pp = result.performance.totalPerformance;
         } else {
             pp = play.pp;
@@ -103,22 +144,6 @@ export class PpSubmitPlayCommand implements Command {
             teamName: '',
         });
 
-        try {
-            await score.save();
-        } catch (err) {
-            if (err.code === 11000) {
-                await InteractionUtils.send(intr, 'You have already submitted this play!');
-                return;
-            } else {
-                console.log(err);
-                await InteractionUtils.send(
-                    intr,
-                    'Something went wrong. Please try again later or contact the host.'
-                );
-                return;
-            }
-        }
-
         //TODO: MAKE NOT NAME HARDCODED
         const match = await PpMatch.findOne({ name: 'AESA' }).exec();
         // const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
@@ -139,6 +164,22 @@ export class PpSubmitPlayCommand implements Command {
             return;
         }
 
+        try {
+            await score.save();
+        } catch (err) {
+            if (err.code === 11000) {
+                await InteractionUtils.send(intr, 'You have already submitted this play!');
+                return;
+            } else {
+                console.log(err);
+                await InteractionUtils.send(
+                    intr,
+                    'Something went wrong. Please try again later or contact the host.'
+                );
+                return;
+            }
+        }
+
         score.teamName = team.name;
 
         const leaderboards = match.leaderboards;
@@ -146,8 +187,7 @@ export class PpSubmitPlayCommand implements Command {
         if (play.mode !== 'osu') {
             // await InteractionUtils.send(intr, 'This play is not in osu! standard!');
             // return;
-            console.log(score);
-            currLeaderboard = leaderboards[-1];
+            currLeaderboard = leaderboards[5];
         } else {
             currLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, leaderboards);
         }

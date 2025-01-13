@@ -36,7 +36,7 @@ const osuScoreSchema = new Schema<IOsuScore>({
     accuracy: { type: Number, required: true },
     count300: { type: Number, required: true },
     count100: { type: Number, required: true },
-    count50: { type: Number, required: true },
+    count50: { type: Number, required: false },
     countMiss: { type: Number, required: true },
     maxCombo: { type: Number, required: true },
     beatmapMaxCombo: { type: Number, required: true },
