@@ -44,7 +44,7 @@ export class PpSubmitPlayCommand implements Command {
         }
         //TODO: write this better
 
-        if (play.createdAt < 1736136000 || play.createdAt > 1737860400) {
+        if (play.createdAt < 1736136000 || play.createdAt > 17379468000) {
             InteractionUtils.send(intr, 'This play is not in the time range!');
             return;
         }
