@@ -18,7 +18,7 @@ export class AuctionTeamCommand implements Command {
         const auction = await Auction.findOne({ guild_id: intr.guildId }).exec();
         const items = auction.getItems(intr.user.id);
         if (items.length === 0) {
-            await InteractionUtils.send(intr, `no friends lol`);
+            await InteractionUtils.send(intr, `nothing`);
             return;
         }
         const itemsString = items.join('\n');

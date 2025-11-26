@@ -18,6 +18,8 @@ interface IAuctionPlayer {
     bestMap: string;
     bestMapRank: string;
     bestMapScore: number;
+    skillIssue: number;
+    etx: number;
     avatar: string;
 }
 
@@ -38,6 +40,8 @@ const auctionPlayerScehma = new Schema<IAuctionPlayer>({
     bestMap: { type: String, required: true },
     bestMapRank: { type: String, required: true },
     bestMapScore: { type: Number, required: true },
+    skillIssue: { type: Number, required: true },
+    etx: { type: Number, required: true },
     avatar: { type: String, required: true },
 });
 

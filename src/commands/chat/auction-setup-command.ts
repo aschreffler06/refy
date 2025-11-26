@@ -204,7 +204,7 @@ async function cleanBidders(
 
 async function readPlayers(): Promise<string[][]> {
     //PLAYER STUFF ITS HARDCODED WITH A CSV YEP HAHAHAA
-    const csvFilePath = path.resolve(__dirname, '../../../AAAH3Quals.csv');
+    const csvFilePath = path.resolve(__dirname, '../../../AAAH4Quals.csv');
 
     const headers = [
         'seed',
@@ -216,6 +216,8 @@ async function readPlayers(): Promise<string[][]> {
         'bestmap',
         'bestmaprank',
         'bestmapscore',
+        'skillissue',
+        'etx',
     ];
 
     const fileContent = fs.readFileSync(csvFilePath, 'utf8');
@@ -244,6 +246,8 @@ async function readPlayers(): Promise<string[][]> {
                         bestMap: player['bestmap'],
                         bestMapRank: player['bestmaprank'],
                         bestMapScore: parseInt(player['bestmapscore']),
+                        skillIssue: player['skillissue'],
+                        etx: player['etx'],
                     };
                 });
                 resolve();

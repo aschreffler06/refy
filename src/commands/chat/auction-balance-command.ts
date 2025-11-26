@@ -33,7 +33,7 @@ export class AuctionBalanceCommand implements Command {
             const cash = auction.getCash(intr.user.id);
             cashEmbed = new EmbedBuilder()
                 .setTitle(`Viewing ${intr.user.username}'s Cash`)
-                .addFields({ name: 'Cash', value: '$' + cash.toFixed(2).toString() });
+                .addFields({ name: 'Cash', value: '$' + cash.toString() });
         }
 
         await InteractionUtils.send(intr, cashEmbed);
