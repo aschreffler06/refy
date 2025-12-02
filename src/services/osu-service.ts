@@ -1,22 +1,15 @@
 import axios from 'axios';
 import { createRequire } from 'node:module';
 
-import { GetUserParams } from '../enums/index.js';
+import { GetUserParams, OsuMode } from '../enums/index.js';
 import { OsuScoreDTO } from '../models/data-objects/osu-score-dto.js';
 import { OsuUserInfoDTO } from '../models/data-objects/osu-user-info-dto.js';
 import { Player, Token } from '../models/database/index.js';
-// import { Request, Response, Router } from 'express';
-// import router from 'express-promise-router';
-
-// import { Controller } from './controller.js';
-// import { GetAuthTokenResponse } from '../models/osu-api/index.js';
-// import { GetOsuUserRequest } from '../models/osu-api/osu.js';
 
 const require = createRequire(import.meta.url);
 let Config = require('../../config/config.json');
 
-// export class OsuController implements Controller {
-export class OsuController {
+export class OsuService {
     private osuEndpoint = 'https://osu.ppy.sh/api/v2';
 
     private async getAuthToken(forceNew: boolean = false): Promise<string> {
@@ -43,43 +36,42 @@ export class OsuController {
                 return token.token;
             }
         } catch (err) {
-            console.log('Error getting access token');
+            console.log('Error getting auth token:', err);
+            throw new Error('Failed to get osu! API token');
         }
     }
 
     public async getUser({ id = null, username = null }: GetUserParams): Promise<OsuUserInfoDTO> {
         const token = await this.getAuthToken();
+        if (!token) {
+            throw new Error('Failed to authenticate with osu! API');
+        }
         const config = {
             headers: { Authorization: `Bearer ${token}` },
         };
         let user;
         try {
             if (id) {
-                console.log('Getting user with id: ', id);
-                user = await axios.get(`${this.osuEndpoint}/users/${id}/osu`, config);
-            } else if (username) {
-                console.log('Getting user: ', username);
-                user = await axios.get(
-                    `${this.osuEndpoint}/users/${username}/osu?key=username`,
-                    config
-                );
+                user = await axios.get(`${this.osuEndpoint}/users/${id}`, config);
             } else {
-                throw new Error('No id or username provided');
+                user = await axios.get(`${this.osuEndpoint}/users/${username}`, config);
             }
-            return new OsuUserInfoDTO(
-                user.data.id,
-                user.data.username,
-                user.data.statistics.global_rank,
-                user.data.badges.length,
-                Math.round(user.data.statistics.hit_accuracy * 100) / 100,
-                user.data.statistics.level.current,
-                user.data.statistics.play_count,
-                Math.round((user.data.statistics.play_time / 3600) * 100) / 100,
-                user.data.avatar_url
-            );
         } catch (err) {
-            console.log('Error getting user');
+            console.log('Error fetching user:', err);
+            throw new Error(`Failed to fetch osu! user: ${username || id}`);
         }
+        const data = user.data;
+        return new OsuUserInfoDTO(
+            data.id,
+            data.username,
+            data.statistics.global_rank,
+            data.badges.length,
+            data.statistics.hit_accuracy,
+            data.statistics.level.current,
+            data.statistics.play_count,
+            data.statistics.play_time,
+            data.avatar_url
+        );
     }
 
     /**
@@ -88,20 +80,37 @@ export class OsuController {
      * @param mode
      * @returns
      */
-    public async getRecentPlays(discordId: string, mode?: string): Promise<OsuScoreDTO[]> {
+    public async getRecentPlays(
+        discordId: string,
+        mode?: OsuMode | string
+    ): Promise<OsuScoreDTO[]> {
         if (!mode) {
-            mode = 'osu';
+            mode = OsuMode.STANDARD;
         }
         const token = await this.getAuthToken();
+        if (!token) {
+            throw new Error('Failed to authenticate with osu! API');
+        }
         const config = {
             headers: { Authorization: `Bearer ${token}` },
         };
         const osu = await Player.findOne({ discord: discordId }).exec();
+        if (!osu) {
+            throw new Error(
+                'Player not found. Please link your osu! account first using /link command.'
+            );
+        }
         const osuId = osu._id;
-        const recentPlays = await axios.get(
-            `${this.osuEndpoint}/users/${osuId}/scores/recent?limit=25&mode=${mode}`,
-            config
-        );
+        let recentPlays;
+        try {
+            recentPlays = await axios.get(
+                `${this.osuEndpoint}/users/${osuId}/scores/recent?limit=25&mode=${mode}`,
+                config
+            );
+        } catch (err) {
+            console.log('Error fetching recent plays:', err);
+            throw new Error('Failed to fetch recent plays from osu! API');
+        }
         const scores: OsuScoreDTO[] = [];
         for (const play of recentPlays.data) {
             scores.push(
@@ -123,6 +132,7 @@ export class OsuController {
                     Math.trunc(new Date(play.created_at).getTime() / 1000),
                     play.mode,
                     play.passed,
+                    play.beatmap.beatmapset_id,
                     play.beatmap.id,
                     play.beatmap.status,
                     play.beatmapset.title,
@@ -140,11 +150,13 @@ export class OsuController {
         const config = {
             headers: { Authorization: `Bearer ${token}` },
         };
-        const beatmap = await axios.get(
-            `${this.osuEndpoint}/beatmaps/lookup?id=${beatmapId}`,
-            config
-        );
-        return beatmap.data.max_combo;
+        try {
+            const beatmap = await axios.get(`${this.osuEndpoint}/beatmaps/${beatmapId}`, config);
+            return beatmap.data.max_combo;
+        } catch (err) {
+            console.log('Error fetching beatmap combo:', err);
+            return 0; // Return 0 as fallback
+        }
     }
 
     public async getBeatmapDifficulty(beatmapId: string): Promise<number> {
@@ -152,11 +164,13 @@ export class OsuController {
         const config = {
             headers: { Authorization: `Bearer ${token}` },
         };
-        const beatmap = await axios.get(
-            `${this.osuEndpoint}/beatmaps/lookup?id=${beatmapId}`,
-            config
-        );
-        return beatmap.data.difficulty_rating;
+        try {
+            const beatmap = await axios.get(`${this.osuEndpoint}/beatmaps/${beatmapId}`, config);
+            return beatmap.data.difficulty_rating;
+        } catch (err) {
+            console.log('Error fetching beatmap difficulty:', err);
+            return 0; // Return 0 as fallback
+        }
     }
 
     public async getBeatmapModdedDifficulty(beatmapId: string, mods: string[]): Promise<number> {
@@ -164,11 +178,25 @@ export class OsuController {
         const config = {
             headers: { Authorization: `Bearer ${token}` },
         };
-        const beatmap = await axios.post(
-            `${this.osuEndpoint}/beatmaps/${beatmapId}/attributes`,
-            { mods: mods },
-            config
-        );
-        return beatmap.data.attributes.star_rating;
+
+        // Handle empty mods array - return normal difficulty
+        if (!mods || mods.length === 0) {
+            return await this.getBeatmapDifficulty(beatmapId);
+        }
+
+        try {
+            // Use POST request with mods array in the request body
+            const beatmap = await axios.post(
+                `${this.osuEndpoint}/beatmaps/${beatmapId}/attributes`,
+                {
+                    mods: mods,
+                },
+                config
+            );
+            return beatmap.data.attributes.star_rating;
+        } catch (err) {
+            console.log('Error fetching beatmap modded difficulty:', err);
+            return 0; // Return 0 as fallback
+        }
     }
 }

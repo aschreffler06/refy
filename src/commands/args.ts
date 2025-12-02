@@ -1,6 +1,6 @@
 import { APIApplicationCommandBasicOption, ApplicationCommandOptionType } from 'discord.js';
 
-import { HelpOption, InfoOption } from '../enums/index.js';
+import { HelpOption, InfoOption, OsuMode } from '../enums/index.js';
 import { Language } from '../models/enum-helpers/index.js';
 import { Lang } from '../services/index.js';
 
@@ -66,10 +66,34 @@ export class Args {
         type: ApplicationCommandOptionType.Integer,
         required: true,
     };
+    public static readonly MATCH_NAME: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.matchName', Language.Default),
+        description: Lang.getRef('argDescs.matchName', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+    };
     public static readonly MODE: APIApplicationCommandBasicOption = {
         name: Lang.getRef('arguments.mode', Language.Default),
         description: Lang.getRef('argDescs.mode', Language.Default),
         type: ApplicationCommandOptionType.String,
+        choices: [
+            {
+                name: 'standard',
+                value: OsuMode.STANDARD,
+            },
+            {
+                name: 'taiko',
+                value: OsuMode.TAIKO,
+            },
+            {
+                name: 'catch',
+                value: OsuMode.CATCH,
+            },
+            {
+                name: 'mania',
+                value: OsuMode.MANIA,
+            },
+        ],
         required: false,
     };
     public static readonly RECENT: APIApplicationCommandBasicOption = {

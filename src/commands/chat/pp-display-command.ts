@@ -2,11 +2,12 @@ import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 // import { OsuController } from '../../controllers/osu-controller.js';
+import { MatchStatus, OsuMode } from '../../enums/index.js';
 import { Player, PpMatch } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
-import { InteractionUtils, PpLeaderboardUtils } from '../../utils/index.js';
+import { InteractionUtils, PpLeaderboardUtils, ScoreManagementUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 
 export class PpDisplayCommand implements Command {
@@ -15,17 +16,23 @@ export class PpDisplayCommand implements Command {
     public deferType = CommandDeferType.PUBLIC;
     public requireClientPerms: PermissionsString[] = [];
 
-    public async execute(intr: ChatInputCommandInteraction, _data: EventData): Promise<void> {
-        // const args = {
-        //     showAll: intr.options.getBoolean(Lang.getRef('arguments.showAll', _data.lang)),
-        // }
+    public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
+        const args = {
+            mode: intr.options.getString(Lang.getRef('arguments.mode', data.lang)),
+        };
 
-        //TODO: MAKE NOT NAME HARDCODED
-        const match = await PpMatch.findOne({ name: 'AESA' }).exec();
-        // const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
+        const mode = (args.mode as OsuMode) ?? OsuMode.STANDARD;
+        const match = await PpMatch.findOne({
+            guildId: intr.guildId,
+            status: MatchStatus.ACTIVE,
+        }).exec();
         const player = await Player.findOne({ discord: intr.user.id }).exec();
         const leaderboards = match.leaderboards;
-        const currentLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, leaderboards);
+        const currentLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(
+            player,
+            leaderboards,
+            mode
+        );
 
         // if (showAll) {
         //     for (const leaderboard of leaderboards) {
@@ -33,26 +40,11 @@ export class PpDisplayCommand implements Command {
         //     }
         // }
 
-        // make a map with the team names as the keys and the pp of the plays as the values
-        const teamMap = new Map<string, number[]>();
-        for (const team of match.teams) {
-            teamMap.set(team.name, []);
-        }
-
-        // add the pp of the plays to the map
-        for (const score of currentLeaderboard.scores) {
-            teamMap.get(score.teamName).push(score.pp);
-        }
-
-        // get the total pp for each team
+        // get the total pp for each team using only active scores
         const teamPpMap = new Map<string, number>();
-        for (const [teamName, scores] of teamMap) {
-            scores.sort((a, b) => b - a);
-            let teamPp = 0;
-            for (let i = 0; i < 100 && i < scores.length; i++) {
-                teamPp += scores[i] * Math.pow(0.95, i);
-            }
-            teamPpMap.set(teamName, teamPp);
+        for (const team of match.teams) {
+            const teamPp = ScoreManagementUtils.calculateTeamPp(currentLeaderboard, team.name);
+            teamPpMap.set(team.name, teamPp);
         }
 
         let teamsString = `Range: ${currentLeaderboard.lowerRank} - ${currentLeaderboard.upperRank}\n\n`;

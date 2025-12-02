@@ -1,6 +1,7 @@
 import { Model, model, Schema } from 'mongoose';
 
 import { IOsuScore, IPlayer, osuScoreSchema, playerSchema } from './index.js';
+import { MatchStatus, OsuMode } from '../../enums/index.js';
 
 // TEAMS
 interface IPpTeam {
@@ -23,6 +24,7 @@ interface IPpLeaderboard {
     upperRank: number;
     //score tied with the team name who set it
     scores: IOsuScore[];
+    mode: OsuMode;
 }
 
 type PpLeaderboardDocumentProps = {
@@ -33,6 +35,7 @@ const ppLeaderboardSchema = new Schema<IPpLeaderboard, unknown, PpLeaderboardDoc
     lowerRank: { type: Number, required: true },
     upperRank: { type: Number, required: true },
     scores: { type: [osuScoreSchema], required: true },
+    mode: { type: String, required: true, default: OsuMode.STANDARD },
 });
 
 // MATCHES
@@ -41,6 +44,7 @@ interface IPpMatch {
     guildId: string;
     teams: IPpTeam[];
     leaderboards: IPpLeaderboard[];
+    status: MatchStatus;
 }
 
 type PpMatchDocumentProps = {
@@ -50,7 +54,7 @@ type PpMatchDocumentProps = {
 
 interface IPpMatchMethods {
     addTeam: (teamName: string) => void;
-    addLeaderboard: (lowerRank: number, upperRank: number) => void;
+    addLeaderboard: (lowerRank: number, upperRank: number, mode: OsuMode) => void;
 }
 
 type PpMatchModel = Model<IPpMatch, unknown, IPpMatchMethods>;
@@ -62,6 +66,7 @@ const ppMatchSchema = new Schema<IPpMatch, PpMatchModel, IPpMatchMethods, PpMatc
     guildId: { type: String, required: true },
     teams: { type: [ppTeamSchema], required: true },
     leaderboards: { type: [ppLeaderboardSchema], required: true },
+    status: { type: String, enum: Object.values(MatchStatus), default: MatchStatus.ACTIVE },
 });
 
 ppMatchSchema.method('addTeam', function addTeam(teamName: string) {
@@ -73,11 +78,16 @@ ppMatchSchema.method('addTeam', function addTeam(teamName: string) {
 
 ppMatchSchema.method(
     'addLeaderboard',
-    function addLeaderboard(lowerRank: number, upperRank: number) {
+    function addLeaderboard(
+        lowerRank: number,
+        upperRank: number,
+        mode: OsuMode = OsuMode.STANDARD
+    ) {
         this.leaderboards.push({
             lowerRank: lowerRank,
             upperRank: upperRank,
             scores: [],
+            mode: mode,
         });
     }
 );

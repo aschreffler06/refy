@@ -22,7 +22,7 @@ import * as fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { OsuController } from '../../controllers/osu-controller.js';
+import { OsuService } from '../../services/index.js';
 import { UserNotInGuildError } from '../../error/index.js';
 import { OsuUserInfoDTO } from '../../models/data-objects/index.js';
 import { Auction } from '../../models/database/index.js';
@@ -256,10 +256,10 @@ async function readPlayers(): Promise<string[][]> {
     });
     console.log(players);
 
-    const osuController = new OsuController();
+    const osuService = new OsuService();
     for (let i = 0; i < players.length; i++) {
         const player = players[i];
-        const userInfo: OsuUserInfoDTO = await osuController.getUser({
+        const userInfo: OsuUserInfoDTO = await osuService.getUser({
             username: player['name'],
         });
         player['avatar'] = userInfo.avatar;

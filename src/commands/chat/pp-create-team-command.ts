@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
+import { MatchStatus } from '../../enums/index.js';
 import { PpMatch } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
@@ -18,11 +19,16 @@ export class PpCreateTeamCommand implements Command {
         const args = {
             name: intr.options.getString(Lang.getRef('arguments.name', data.lang)),
         };
-        //TODO: MAKE NOT NAME HARDCODED
-        const match = await PpMatch.findOne({ name: 'AESA' }).exec();
-        // const match = await PpMatch.findOne({ guildId: intr.guildId }).exec();
+
+        const match = await PpMatch.findOne({
+            guildId: intr.guildId,
+            status: MatchStatus.ACTIVE,
+        }).exec();
         if (!match) {
-            await InteractionUtils.send(intr, `No match is currently in progress for this server.`);
+            await InteractionUtils.send(
+                intr,
+                `No active match is currently in progress for this server.`
+            );
             return;
         }
         match.addTeam(args.name);

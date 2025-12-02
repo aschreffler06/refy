@@ -221,8 +221,9 @@
             "viewDateSent": "View Date Sent"
         },
         "arguments": {
-            "option": "option",
+            "matchName": "match-name",
             "name": "name",
+            "option": "option",
             "id": "id",
             "lowerRank": "lower-rank",
             "mode": "mode",
@@ -259,9 +260,10 @@
             "infoOption": "Option.",
             "name": "Name",
             "lowerRank": "Lower Rank Bound",
+            "matchName": "Match Name",
             "mode": "osu! gamemode. Defaults to 'osu' and can be specified to 'mania', 'taiko', or 'fruits'.",
             "id": "ID",
-            "recent": "Recent Number",
+            "recent": "Offset for recent play (Does not include fails). 1 is most recent.",
             "showAll": "Show all",
             "team1Name": "Team 1 Name",
             "team2Name": "Team 2 Name",

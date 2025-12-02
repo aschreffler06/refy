@@ -25,6 +25,7 @@ export class OsuScoreDTO {
     mode: OsuMode;
     passed: boolean;
     //TODO: break these down into beatmap/set
+    beatmapSetId: string;
     beatmapId: string;
     status: string;
     title: string;
@@ -50,6 +51,7 @@ export class OsuScoreDTO {
         createdAt: number,
         mode: OsuMode,
         passed: boolean,
+        beatmapSetId: string,
         beatmapId: string,
         status: string,
         title: string,
@@ -74,6 +76,7 @@ export class OsuScoreDTO {
         this.createdAt = createdAt;
         this.mode = mode;
         this.passed = passed;
+        this.beatmapSetId = beatmapSetId;
         this.beatmapId = beatmapId;
         this.status = status;
         this.title = title;

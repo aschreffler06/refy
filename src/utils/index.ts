@@ -8,6 +8,7 @@ export { PartialUtils } from './partial-utils.js';
 export { PermissionUtils } from './permission-utils.js';
 export { PpLeaderboardUtils } from './pp-leaderboard-utils.js';
 export { RandomUtils } from './random-utils.js';
+export { ScoreManagementUtils } from './score-management-utils.js';
 export { RegexUtils } from './regex-utils.js';
 export { ShardUtils } from './shard-utils.js';
 export { StringUtils } from './string-utils.js';

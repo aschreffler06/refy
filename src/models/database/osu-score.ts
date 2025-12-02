@@ -21,6 +21,7 @@ interface IOsuScore {
     mode: OsuMode;
     passed: boolean;
     //TODO: break these down into beatmap/set
+    beatmapSetId: string;
     beatmapId: string;
     status: string;
     title: string;
@@ -28,6 +29,7 @@ interface IOsuScore {
     url: string;
     list: string;
     teamName: string;
+    isActive: boolean; // Whether this score counts toward leaderboard
 }
 
 const osuScoreSchema = new Schema<IOsuScore>({
@@ -48,6 +50,7 @@ const osuScoreSchema = new Schema<IOsuScore>({
     created_at: { type: Number, required: true },
     mode: { type: String, required: true },
     passed: { type: Boolean, required: true },
+    beatmapSetId: { type: String, required: true },
     beatmapId: { type: String, required: true },
     status: { type: String, required: true },
     title: { type: String, required: true },
@@ -55,6 +58,7 @@ const osuScoreSchema = new Schema<IOsuScore>({
     url: { type: String, required: true },
     list: { type: String, required: true },
     teamName: { type: String, required: false },
+    isActive: { type: Boolean, required: true, default: true },
 });
 
 const OsuScore = model('OsuScore', osuScoreSchema);
