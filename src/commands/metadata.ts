@@ -60,12 +60,6 @@ export const ChatCommandMetadata: {
         default_member_permissions: PermissionsBitField.resolve([
             PermissionFlagsBits.ManageGuild,
         ]).toString(),
-    },
-    AUCTION_BALANCE: {
-        type: ApplicationCommandType.ChatInput,
-        name: Lang.getRef('chatCommands.auctionBalance', Language.Default),
-        description: Lang.getRef('commandDescs.auctionBalance', Language.Default),
-        dm_permission: true,
         options: [
             {
                 ...Args.SHOW_ALL,
