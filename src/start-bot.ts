@@ -21,6 +21,7 @@ import {
     PpDisplayTotalCommand,
     PpGetScoreCommand,
     PpJoinTeamCommand,
+    PpSetUpdatesChannelCommand,
     PpSubmitPlayCommand,
     PpUserStatsCommand,
     // TestCommand,
@@ -102,6 +103,7 @@ async function start(): Promise<void> {
         new PpDisplayTotalCommand(),
         new PpGetScoreCommand(),
         new PpJoinTeamCommand(),
+        new PpSetUpdatesChannelCommand(),
         new PpSubmitPlayCommand(),
         new PpUserStatsCommand(),
 

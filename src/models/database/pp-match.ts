@@ -45,6 +45,8 @@ interface IPpMatch {
     teams: IPpTeam[];
     leaderboards: IPpLeaderboard[];
     status: MatchStatus;
+    // optional channel id where match updates should be posted
+    updatesChannelId?: string;
 }
 
 type PpMatchDocumentProps = {
@@ -67,6 +69,7 @@ const ppMatchSchema = new Schema<IPpMatch, PpMatchModel, IPpMatchMethods, PpMatc
     teams: { type: [ppTeamSchema], required: true },
     leaderboards: { type: [ppLeaderboardSchema], required: true },
     status: { type: String, enum: Object.values(MatchStatus), default: MatchStatus.ACTIVE },
+    updatesChannelId: { type: String, required: false },
 });
 
 ppMatchSchema.method('addTeam', function addTeam(teamName: string) {

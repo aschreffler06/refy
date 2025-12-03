@@ -13,8 +13,20 @@ export class ScoreManagementUtils {
      * @param newScore The newly added score
      * @returns Array of scores that had their isActive status changed
      */
-    public static manageActiveScoresOnAdd(leaderboard: any, newScore: IOsuScore): IOsuScore[] {
-        // Add the score to the leaderboard first
+    public static manageActiveScoresOnAdd(leaderboard: any, newScore: IOsuScore): any {
+        // Quick pre-check: if there's already an active score on this beatmap set
+        // with pp >= the submitted pp, reject early to avoid unnecessary work.
+        const topExisting = leaderboard.scores
+            .filter((s: IOsuScore) => s.beatmapSetId === newScore.beatmapSetId && s.isActive)
+            .sort((a: IOsuScore, b: IOsuScore) => b.pp - a.pp)[0];
+
+        if (topExisting && topExisting.pp >= newScore.pp) {
+            return { rejected: { reason: 'existingHigher', existingScore: topExisting } };
+        }
+
+        // Activate the new score
+        newScore.isActive = true;
+        // Add the score to the leaderboard
         leaderboard.scores.push(newScore);
 
         // Store initial active states of all scores (including the new one)
@@ -22,9 +34,6 @@ export class ScoreManagementUtils {
         for (const score of leaderboard.scores) {
             initialStates.set(score._id, score.isActive);
         }
-
-        // Activate the new score
-        newScore.isActive = true;
 
         // Apply player limits and get affected beatmaps
         const affectedBeatmaps = this.applyPlayerLimitsAndGetAffectedBeatmaps(
@@ -38,16 +47,19 @@ export class ScoreManagementUtils {
         // Keep processing until no more changes occur
         this.resolveAllChanges(leaderboard, affectedBeatmaps);
 
-        // Find all scores that had their isActive status changed
-        const modifiedScores: IOsuScore[] = [];
-        for (const score of leaderboard.scores) {
-            const initialActive = initialStates.get(score._id);
-            if (initialActive !== score.isActive) {
-                modifiedScores.push(score);
-            }
+        // Capture the highest active score on this beatmap set after changes
+        const topAfter =
+            leaderboard.scores
+                .filter((s: IOsuScore) => s.beatmapSetId === newScore.beatmapSetId && s.isActive)
+                .sort((a: IOsuScore, b: IOsuScore) => b.pp - a.pp)[0] || null;
+
+        // Determine if a snipe occurred: an existing top active score was replaced
+        let event: any = { type: 'none' };
+        if (topExisting && topAfter && topExisting._id !== topAfter._id) {
+            event = { type: 'sniped', snipedScore: topExisting };
         }
 
-        return modifiedScores;
+        return { event, affectedBeatmaps: Array.from(affectedBeatmaps) };
     }
 
     /**

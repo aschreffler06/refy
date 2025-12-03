@@ -211,6 +211,7 @@
             "ppDisplayTotal": "pp-display-total",
             "ppGetScore": "pp-get-score",
             "ppJoinTeam": "pp-join-team",
+            "ppSetUpdatesChannel": "pp-set-updates-channel",
             "ppSubmitPlay": "pp-submit-play",
             "ppUserStats": "pp-user-stats"
         },
@@ -221,6 +222,7 @@
             "viewDateSent": "View Date Sent"
         },
         "arguments": {
+            "channel": "channel",
             "matchName": "match-name",
             "name": "name",
             "option": "option",
@@ -251,6 +253,7 @@
             "ppDisplayTotal": "Display the total combined pp for a leaderboard.",
             "ppGetScore": "Given an osu beatmap id, get the current leaderboard score for that map",
             "ppJoinTeam": "Join a team for the leaderboard showdown.",
+            "ppSetUpdatesChannel": "Set the channel for leaderboard updates.",
             "ppSubmitPlay": "Submit a play for the leaderboard for your team.",
             "ppUserStats": "View your total plays and pp contributed",
             "link": "Link your osu account"
@@ -258,6 +261,7 @@
         "argDescs": {
             "helpOption": "Option.",
             "infoOption": "Option.",
+            "channel": "The channel to have updates sent to.",
             "name": "Name",
             "lowerRank": "Lower Rank Bound",
             "matchName": "Match Name",

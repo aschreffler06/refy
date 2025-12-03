@@ -182,21 +182,8 @@ export class PpSubmitPlayCommand implements Command {
             score.pp *= 1.3;
         }
 
-        try {
-            await score.save();
-        } catch (err) {
-            if (err.code === 11000) {
-                await InteractionUtils.send(intr, 'You have already submitted this play.');
-                return;
-            } else {
-                console.log(err);
-                await InteractionUtils.send(
-                    intr,
-                    'Something went wrong. Please try again later or contact the host.'
-                );
-                return;
-            }
-        }
+        // Note: defer saving until after score-management resolves
+        // so that the management utilities can decide activation/ownership.
 
         score.teamName = team.name;
 
@@ -211,49 +198,33 @@ export class PpSubmitPlayCommand implements Command {
             return;
         }
 
-        // Check for existing score by this player on the same beatmap set (should be max 1)
-        const existingPlayerScore = currLeaderboard.scores.find(
-            s => s.userId === score.userId && s.beatmapSetId === score.beatmapSetId
-        );
-
-        if (existingPlayerScore) {
-            // If player already has a higher score, reject the submission
-            if (existingPlayerScore.pp >= score.pp) {
-                const oldPlayer = await Player.findOne({ _id: existingPlayerScore.userId }).exec();
-                await InteractionUtils.send(intr, {
-                    content: 'You already have a higher score on this beatmap set.',
-                    ephemeral: true,
-                    embeds: [
-                        await PpLeaderboardUtils.createScoreEmbed(
-                            oldPlayer,
-                            existingPlayerScore,
-                            currLeaderboard
-                        ),
-                    ],
-                });
-                return;
-            }
-
-            // Remove the lower existing score
-            const index = currLeaderboard.scores.indexOf(existingPlayerScore);
-            currLeaderboard.scores.splice(index, 1);
-        }
-
-        // find if there is any score that matches the same beatmap set (for sniping display)
-        const oldScore = PpLeaderboardUtils.getScoreOnLeaderboard(
-            currLeaderboard,
-            score.beatmapSetId
-        );
-
         // Calculate current team pp before adding the new score
         const oldPp = ScoreManagementUtils.calculateTeamPp(currLeaderboard, score.teamName);
 
-        // Let score management handle everything (adding score, active status, ownership, etc.)
-        const modifiedScores = ScoreManagementUtils.manageActiveScoresOnAdd(currLeaderboard, score);
+        // Let score management handle everything (including an early check for an existing higher score)
+        const result: any = ScoreManagementUtils.manageActiveScoresOnAdd(currLeaderboard, score);
 
-        // Save only the scores that had their isActive status changed
-        const savePromises = modifiedScores.map((s: any) => s.save());
-        await Promise.all(savePromises);
+        if (result && result.rejected) {
+            if (result.rejected.reason === 'existingHigher') {
+                const existing = result.rejected.existingScore;
+                const existingPlayer = await Player.findOne({ _id: existing.userId }).exec();
+                const embed = await PpLeaderboardUtils.createScoreEmbed(
+                    existingPlayer,
+                    existing,
+                    currLeaderboard
+                );
+                await InteractionUtils.send(intr, {
+                    content:
+                        'There is already a higher score on this beatmap set on the leaderboard.',
+                    ephemeral: true,
+                    embeds: [embed],
+                });
+                return;
+            }
+            // unknown rejection
+            await InteractionUtils.send(intr, 'Your submission was rejected.');
+            return;
+        }
 
         // Calculate new team pp using only active scores
         const newPp = ScoreManagementUtils.calculateTeamPp(currLeaderboard, score.teamName);
@@ -268,11 +239,11 @@ export class PpSubmitPlayCommand implements Command {
 
         await match.save();
 
-        // Send appropriate message based on whether this was a snipe
-        const message =
-            oldScore && oldScore.pp < score.pp
-                ? `You've sniped a score on this beatmap set!`
-                : undefined;
+        // Send appropriate message based on score-management's event (sniped etc.)
+        let message: string | undefined = undefined;
+        if (result && result.event && result.event.type === 'sniped') {
+            message = `You've sniped a score on this beatmap set!`;
+        }
 
         await InteractionUtils.send(intr, {
             content: message,

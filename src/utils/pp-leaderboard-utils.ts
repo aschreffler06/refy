@@ -36,7 +36,7 @@ export class PpLeaderboardUtils {
         const highestActiveScore = beatmapSetScores.find(s => s.isActive);
 
         let scoreEmbed = new EmbedBuilder()
-            .setTitle(`Score #${scoreNumber + 1} | ${activeStatus}`)
+            .setTitle(`Score #${scoreNumber} | ${activeStatus}`)
             .setAuthor({
                 name: `${player.username} | ${score.teamName} ${leaderboard.lowerRank} - ${leaderboard.upperRank} | ${leaderboard.mode}`,
                 iconURL: player.avatar,

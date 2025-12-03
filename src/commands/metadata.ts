@@ -244,6 +244,21 @@ export const ChatCommandMetadata: {
             },
         ],
     },
+    PP_SET_UPDATES_CHANNEL: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppSetUpdatesChannel', Language.Default),
+        description: Lang.getRef('commandDescs.ppSetUpdatesChannel', Language.Default),
+        dm_permission: true,
+        default_member_permissions: PermissionsBitField.resolve([
+            PermissionFlagsBits.ManageGuild,
+        ]).toString(),
+        options: [
+            {
+                ...Args.CHANNEL,
+                required: true,
+            },
+        ],
+    },
     PP_SUBMIT_PLAY: {
         type: ApplicationCommandType.ChatInput,
         name: Lang.getRef('chatCommands.ppSubmitPlay', Language.Default),
