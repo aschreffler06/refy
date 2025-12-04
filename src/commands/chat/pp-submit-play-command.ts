@@ -172,14 +172,14 @@ export class PpSubmitPlayCommand implements Command {
             } else {
                 score.pp *= 1.5;
             }
-        }
+        } else {
+            if (score.mods.includes(OsuMod.DT) || score.mods.includes(OsuMod.NC)) {
+                score.pp *= 0.9;
+            }
 
-        if (score.mods.includes(OsuMod.DT) || score.mods.includes(OsuMod.NC)) {
-            score.pp *= 0.9;
-        }
-
-        if (score.mods.includes(OsuMod.HT)) {
-            score.pp *= 1.3;
+            if (score.mods.includes(OsuMod.HT)) {
+                score.pp *= 1.3;
+            }
         }
 
         // Note: defer saving until after score-management resolves
