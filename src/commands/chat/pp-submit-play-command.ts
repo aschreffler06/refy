@@ -162,6 +162,9 @@ export class PpSubmitPlayCommand implements Command {
             );
             return;
         }
+
+        score.teamName = team.name;
+
         // Add to score leaderboard
         const scoreLb = match.scoreLeaderboard;
         if (scoreLb && scoreLb.mode === mode) {
@@ -199,11 +202,6 @@ export class PpSubmitPlayCommand implements Command {
                 score.pp *= 1.3;
             }
         }
-
-        // Note: defer saving until after score-management resolves
-        // so that the management utilities can decide activation/ownership.
-
-        score.teamName = team.name;
 
         const leaderboards = match.leaderboards;
         let currLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, leaderboards, mode);
