@@ -5,7 +5,7 @@ import { MatchStatus } from '../../enums/index.js';
 import { Player, PpMatch } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
-import { Lang } from '../../services/index.js';
+import { GoogleSheetsService, Lang } from '../../services/index.js';
 import { InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 
@@ -81,12 +81,74 @@ export class PpJoinTeamCommand implements Command {
             Vermont: 'North',
         };
 
-        // Helper to decide team from member roles.
-        const decideTeamFromRoles = (memberRoles: Iterable<any>): string | null => {
+        // Timezone mapping by state
+        const STATE_TIMEZONE: Record<string, string> = {
+            // Pacific Time (UTC-8)
+            Alaska: 'UTC-9',
+            California: 'UTC-8',
+            Hawaii: 'UTC-10',
+            Oregon: 'UTC-8',
+            Washington: 'UTC-8',
+
+            // Mountain Time (UTC-7)
+            Arizona: 'UTC-7',
+            Colorado: 'UTC-7',
+            Idaho: 'UTC-7',
+            'Missouri/Montana': 'UTC-7',
+            Nevada: 'UTC-8',
+            'New Mexico': 'UTC-7',
+            Utah: 'UTC-7',
+            Wyoming: 'UTC-7',
+
+            // Central Time (UTC-6)
+            Alabama: 'UTC-6',
+            Arkansas: 'UTC-6',
+            Illinois: 'UTC-6',
+            Iowa: 'UTC-6',
+            Kansas: 'UTC-6',
+            Louisiana: 'UTC-6',
+            Minnesota: 'UTC-6',
+            Mississippi: 'UTC-6',
+            Nebraska: 'UTC-6',
+            'North Dakota': 'UTC-6',
+            Oklahoma: 'UTC-6',
+            'South Dakota': 'UTC-6',
+            Tennessee: 'UTC-6',
+            Texas: 'UTC-6',
+            Wisconsin: 'UTC-6',
+
+            // Eastern Time (UTC-5)
+            Connecticut: 'UTC-5',
+            Delaware: 'UTC-5',
+            'Florida/Territories': 'UTC-5',
+            Georgia: 'UTC-5',
+            Indiana: 'UTC-5',
+            Kentucky: 'UTC-5',
+            Maine: 'UTC-5',
+            Maryland: 'UTC-5',
+            Massachusetts: 'UTC-5',
+            Michigan: 'UTC-5',
+            'New Hampshire': 'UTC-5',
+            'New Jersey': 'UTC-5',
+            'New York': 'UTC-5',
+            'North Carolina': 'UTC-5',
+            Ohio: 'UTC-5',
+            Pennsylvania: 'UTC-5',
+            'Rhode Island': 'UTC-5',
+            'South Carolina': 'UTC-5',
+            Vermont: 'UTC-5',
+            Virginia: 'UTC-5',
+            'West Virginia': 'UTC-5',
+        };
+
+        // Helper to decide team from member roles. Returns both team and state role name.
+        const decideTeamFromRoles = (
+            memberRoles: Iterable<any>
+        ): { team: string | null; stateRole: string | null } => {
             for (const r of memberRoles) {
-                if (ROLE_TO_TEAM[r.name]) return ROLE_TO_TEAM[r.name];
+                if (ROLE_TO_TEAM[r.name]) return { team: ROLE_TO_TEAM[r.name], stateRole: r.name };
             }
-            return null;
+            return { team: null, stateRole: null };
         };
 
         const match = await PpMatch.findOne({
@@ -122,6 +184,7 @@ export class PpJoinTeamCommand implements Command {
         }
         // If no team name was provided, attempt to decide from the user's roles
         let targetTeamName = args.teamName;
+        let inferredState: string | null = null;
         if (!targetTeamName) {
             // fetch the guild member to inspect roles (ensures up-to-date info)
             if (!intr.guild) {
@@ -143,7 +206,9 @@ export class PpJoinTeamCommand implements Command {
                 return;
             }
 
-            targetTeamName = decideTeamFromRoles(member.roles.cache.values());
+            const result = decideTeamFromRoles(member.roles.cache.values());
+            targetTeamName = result.team;
+            inferredState = result.stateRole;
             if (!targetTeamName) {
                 await InteractionUtils.send(intr, {
                     content:
@@ -182,6 +247,45 @@ export class PpJoinTeamCommand implements Command {
                     } catch (e) {
                         // ignore member fetch errors and continue
                     }
+                }
+
+                // Append info to Google Sheets (timestamp, team name, player id, discord username, timezone, state)
+                try {
+                    const sheets = GoogleSheetsService.getInstance();
+                    const timestamp = new Date().toISOString();
+                    let state = inferredState;
+
+                    // If state wasn't inferred earlier, try to get it from member roles now
+                    if (!state && intr.guild) {
+                        try {
+                            const memberForState = await intr.guild.members.fetch(intr.user.id);
+                            for (const r of memberForState.roles.cache.values()) {
+                                if (ROLE_TO_TEAM[r.name] === team.name) {
+                                    state = r.name;
+                                    break;
+                                }
+                            }
+                        } catch (e) {
+                            // ignore
+                        }
+                    }
+
+                    const timezone = state ? STATE_TIMEZONE[state] ?? '' : '';
+                    const row = [
+                        [
+                            timestamp,
+                            String(player._id),
+                            intr.user.tag,
+                            timezone,
+                            state ?? '',
+                            team.name,
+                        ],
+                    ];
+                    await sheets.appendToSheet(row);
+                } catch (e) {
+                    // Don't block join on sheet errors; log for debugging
+                    // eslint-disable-next-line no-console
+                    console.error('Failed to append to Google Sheets on team join:', e);
                 }
 
                 await InteractionUtils.send(intr, {
