@@ -1,0 +1,44 @@
+import { RateLimiter } from 'discord.js-rate-limiter';
+import { MatchStatus } from '../../enums/match-status.js';
+import { PpMatch } from '../../models/database/pp-match.js';
+import { Language } from '../../models/enum-helpers/index.js';
+import { Lang } from '../../services/index.js';
+import { InteractionUtils } from '../../utils/index.js';
+import { CommandDeferType } from '../index.js';
+export class PpSetUpdatesChannelCommand {
+    constructor() {
+        this.names = [Lang.getRef('chatCommands.ppSetUpdatesChannel', Language.Default)];
+        this.cooldown = new RateLimiter(1, 5000);
+        this.deferType = CommandDeferType.HIDDEN;
+        this.requireClientPerms = [];
+    }
+    async execute(intr, data) {
+        const channel = intr.options.getChannel(Lang.getRef('arguments.channel', data.lang));
+        if (!channel) {
+            await InteractionUtils.send(intr, {
+                content: 'Please provide a valid channel.',
+                ephemeral: true,
+            });
+            return;
+        }
+        // Find active match for this guild
+        const match = await PpMatch.findOne({
+            guildId: intr.guildId,
+            status: MatchStatus.ACTIVE,
+        }).exec();
+        if (!match) {
+            await InteractionUtils.send(intr, {
+                content: 'There is no active match for this server.',
+                ephemeral: true,
+            });
+            return;
+        }
+        match.updatesChannelId = channel.id;
+        await match.save();
+        await InteractionUtils.send(intr, {
+            content: `Set updates channel to <#${channel.id}> for match **${match.name}**.`,
+            ephemeral: true,
+        });
+    }
+}
+//# sourceMappingURL=pp-set-updates-channel-command.js.map
