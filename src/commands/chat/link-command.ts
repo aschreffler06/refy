@@ -5,8 +5,7 @@ import { OsuUserInfoDTO } from '../../models/data-objects/index.js';
 import { Player } from '../../models/database/player.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
-import { OsuService } from '../../services/index.js';
-import { Lang } from '../../services/index.js';
+import { Lang, OsuService } from '../../services/index.js';
 import { InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 

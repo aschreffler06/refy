@@ -159,6 +159,31 @@ export class PpJoinTeamCommand implements Command {
             if (team.name === targetTeamName) {
                 team.players.push(player);
                 await match.save();
+
+                // Try to assign a Discord role matching the team name
+                if (intr.guild) {
+                    try {
+                        const member = await intr.guild.members.fetch(intr.user.id);
+                        // Find a role in the guild matching the team name
+                        const role = intr.guild.roles.cache.find(r => r.name === team.name);
+                        if (role) {
+                            // Add the team role
+                            try {
+                                await member.roles.add(role.id);
+                            } catch (e) {
+                                // If role assignment fails, notify the user ephemeral
+                                await InteractionUtils.send(intr, {
+                                    content: `Joined team **${targetTeamName}**, but I couldn't assign the role.`,
+                                    ephemeral: true,
+                                });
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        // ignore member fetch errors and continue
+                    }
+                }
+
                 await InteractionUtils.send(intr, {
                     content: `Joined team **${targetTeamName}**!`,
                     ephemeral: true,
