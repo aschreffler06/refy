@@ -12,6 +12,8 @@ interface IPlayer {
     playCount: number;
     playTime: number;
     avatar: string;
+    // Whether the player wants to be pinged when their leaderboard score is sniped
+    notifyOnSnipe?: boolean;
 }
 
 const playerSchema = new Schema<IPlayer>({
@@ -25,6 +27,7 @@ const playerSchema = new Schema<IPlayer>({
     playCount: { type: Number, required: true },
     playTime: { type: Number, required: true },
     avatar: { type: String, required: true },
+    notifyOnSnipe: { type: Boolean, required: false, default: false },
 });
 
 const Player = model('Player', playerSchema);

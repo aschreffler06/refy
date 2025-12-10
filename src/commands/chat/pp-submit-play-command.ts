@@ -162,6 +162,24 @@ export class PpSubmitPlayCommand implements Command {
             );
             return;
         }
+        // Add to score leaderboard
+        const scoreLb = match.scoreLeaderboard;
+        if (scoreLb && scoreLb.mode === mode) {
+            // find if score already exists and check the total score value
+            const existingIndex = scoreLb.scores.findIndex(
+                s => String(s._id) === String(score._id)
+            );
+            if (existingIndex !== -1) {
+                const existingScore = scoreLb.scores[existingIndex];
+                if ((score.score ?? 0) > (existingScore.score ?? 0)) {
+                    // new score is higher — remove the old and add the new
+                    scoreLb.scores.splice(existingIndex, 1);
+                    scoreLb.scores.push(score);
+                }
+            } else {
+                scoreLb.scores.push(score);
+            }
+        }
 
         // Apply PP multipliers BEFORE saving to database
         if (score.mods.includes(OsuMod.EZ)) {
@@ -204,25 +222,19 @@ export class PpSubmitPlayCommand implements Command {
         // Let score management handle everything (including an early check for an existing higher score)
         const result: any = ScoreManagementUtils.manageActiveScoresOnAdd(currLeaderboard, score);
 
-        if (result && result.rejected) {
-            if (result.rejected.reason === 'existingHigher') {
-                const existing = result.rejected.existingScore;
-                const existingPlayer = await Player.findOne({ _id: existing.userId }).exec();
-                const embed = await PpLeaderboardUtils.createScoreEmbed(
-                    existingPlayer,
-                    existing,
-                    currLeaderboard
-                );
-                await InteractionUtils.send(intr, {
-                    content:
-                        'There is already a higher score on this beatmap set on the leaderboard.',
-                    ephemeral: true,
-                    embeds: [embed],
-                });
-                return;
-            }
-            // unknown rejection
-            await InteractionUtils.send(intr, 'Your submission was rejected.');
+        if (result.type === 'existingHigher') {
+            const existing = result.event.otherScore;
+            const existingPlayer = await Player.findOne({ _id: existing.userId }).exec();
+            const embed = await PpLeaderboardUtils.createScoreEmbed(
+                existingPlayer,
+                existing,
+                currLeaderboard
+            );
+            await InteractionUtils.send(intr, {
+                content: 'There is already a higher score on this beatmap set on the leaderboard.',
+                ephemeral: true,
+                embeds: [embed],
+            });
             return;
         }
 
@@ -241,8 +253,34 @@ export class PpSubmitPlayCommand implements Command {
 
         // Send appropriate message based on score-management's event (sniped etc.)
         let message: string | undefined = undefined;
-        if (result && result.event && result.event.type === 'sniped') {
+        if (
+            result &&
+            result.event &&
+            result.event.type === 'sniped' &&
+            score.userId !== result.event.otherScore.userId
+        ) {
             message = `You've sniped a score on this beatmap set!`;
+
+            Player.findOne({ _id: result.event.otherScore.userId }).then(async otherPlayer => {
+                if (!otherPlayer) return;
+                const notify = otherPlayer.notifyOnSnipe ?? false;
+                if (notify) {
+                    // send to the match.updateschannelid
+                    const guild = await intr.client.guilds.fetch(String(match.guildId));
+                    if (!guild) return;
+                    const channel = await guild.channels.fetch(String(match.updatesChannelId));
+                    if (!channel || !channel.isTextBased()) return;
+                    const otherScoreEmbed = await PpLeaderboardUtils.createScoreEmbed(
+                        otherPlayer,
+                        result.event.otherScore,
+                        currLeaderboard
+                    );
+                    await channel.send({
+                        content: `<@${otherPlayer.discord}>, your top score on this beatmap set has been sniped!`,
+                        embeds: [otherScoreEmbed],
+                    });
+                }
+            });
         }
 
         await InteractionUtils.send(intr, {

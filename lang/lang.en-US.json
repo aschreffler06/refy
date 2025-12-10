@@ -204,6 +204,7 @@
             "auctionTeam": "auction-team",
             "createTicket": "create-ticket",
             "link": "link",
+            "ppCreateBounty": "pp-create-bounty",
             "ppCreateLeaderboard": "pp-create-leaderboard",
             "ppCreateMatch": "pp-create-match",
             "ppCreateTeam": "pp-create-team",
@@ -212,7 +213,9 @@
             "ppGetScore": "pp-get-score",
             "ppJoinTeam": "pp-join-team",
             "ppSetUpdatesChannel": "pp-set-updates-channel",
+            "ppSubmitBounty": "pp-submit-bounty",
             "ppSubmitPlay": "pp-submit-play",
+            "ppToggleSnipeNotify": "pp-toggle-snipe-notify",
             "ppUserStats": "pp-user-stats"
         },
         "userCommands": {
@@ -228,12 +231,16 @@
             "option": "option",
             "id": "id",
             "lowerRank": "lower-rank",
+            "mapId": "map-id",
+            "mod": "mod",
             "mode": "mode",
             "recent": "recent",
             "showAll": "show-all",
             "team1Name": "team1-name",
             "team2Name": "team2-name",
-            "upperRank": "upper-rank"
+            "upperRank": "upper-rank",
+            "value": "value",
+            "winCondition": "win-condition"
         },
         "commandDescs": {
             "help": "Find help or contact support.",
@@ -246,6 +253,7 @@
             "auctionStart": "Start an auction. Type 'stop-auction' to stop the auction.",
             "auctionTeam": "Shows your team",
             "createTicket": "Create a ticket for bot support.",
+            "ppCreateBounty": "Create a bounty for others to claim by meeting certain conditions.",
             "ppCreateLeaderboard": "Create a pp leaderboard for the current match.",
             "ppCreateMatch": "Create a match for a pp leaderboard team showdown.",
             "ppCreateTeam": "Create a team for a leaderboard showdown.",
@@ -254,7 +262,9 @@
             "ppGetScore": "Given an osu beatmap id, get the current leaderboard score for that map",
             "ppJoinTeam": "Join a team for the leaderboard showdown.",
             "ppSetUpdatesChannel": "Set the channel for leaderboard updates.",
+            "ppSubmitBounty": "Submit a bounty claim.",
             "ppSubmitPlay": "Submit a play for the leaderboard for your team.",
+            "ppToggleSnipeNotify": "Toggle notifications when your top score is sniped",
             "ppUserStats": "View your total plays and pp contributed",
             "link": "Link your osu account"
         },
@@ -264,14 +274,18 @@
             "channel": "The channel to have updates sent to.",
             "name": "Name",
             "lowerRank": "Lower Rank Bound",
+            "mapId": "Beatmap ID",
             "matchName": "Match Name",
+            "mod": "osu! mod. Defaults to 'NM' (No Mod) and can be specified to other mods like 'HD', 'HR', etc.",
             "mode": "osu! gamemode. Defaults to 'osu' and can be specified to 'mania', 'taiko', or 'fruits'.",
             "id": "ID",
             "recent": "Offset for recent play (Does not include fails). 1 is most recent.",
             "showAll": "Show all",
             "team1Name": "Team 1 Name",
             "team2Name": "Team 2 Name",
-            "upperRank": "Upper Rank Bound"
+            "upperRank": "Upper Rank Bound",
+            "value": "Value for the win condition. (For pass just put anything)",
+            "winCondition": "Win condition for the bounty."
         },
         "fields": {
             "commands": "Commands",

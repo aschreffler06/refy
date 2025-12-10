@@ -135,6 +135,45 @@ export const ChatCommandMetadata: {
             },
         ],
     },
+    PP_CREATE_BOUNTY: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppCreateBounty', Language.Default),
+        description: Lang.getRef('commandDescs.ppCreateBounty', Language.Default),
+        dm_permission: true,
+        default_member_permissions: PermissionsBitField.resolve([
+            PermissionFlagsBits.ManageGuild,
+        ]).toString(),
+        options: [
+            {
+                ...Args.MAP_ID,
+                required: true,
+            },
+            {
+                ...Args.WIN_CONDITION,
+                required: true,
+            },
+            {
+                ...Args.VALUE,
+                required: true,
+            },
+            {
+                ...Args.LOWER_RANK,
+                required: true,
+            },
+            {
+                ...Args.UPPER_RANK,
+                required: true,
+            },
+            {
+                ...Args.MOD,
+                required: false,
+            },
+            {
+                ...Args.MODE,
+                required: false,
+            },
+        ],
+    },
     PP_CREATE_LEADERBOARD: {
         type: ApplicationCommandType.ChatInput,
         name: Lang.getRef('chatCommands.ppCreateLeaderboard', Language.Default),
@@ -240,7 +279,7 @@ export const ChatCommandMetadata: {
         options: [
             {
                 ...Args.NAME,
-                required: true,
+                required: false,
             },
         ],
     },
@@ -256,6 +295,23 @@ export const ChatCommandMetadata: {
             {
                 ...Args.CHANNEL,
                 required: true,
+            },
+        ],
+    },
+    PP_SUBMIT_BOUNTY: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppSubmitBounty', Language.Default),
+        description: Lang.getRef('commandDescs.ppSubmitBounty', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+        options: [
+            {
+                ...Args.RECENT,
+                required: false,
+            },
+            {
+                ...Args.MODE,
+                required: false,
             },
         ],
     },
@@ -275,6 +331,13 @@ export const ChatCommandMetadata: {
                 required: false,
             },
         ],
+    },
+    PP_TOGGLE_SNIPE_NOTIFY: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppToggleSnipeNotify', Language.Default),
+        description: Lang.getRef('commandDescs.ppToggleSnipeNotify', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
     },
     PP_USER_STATS: {
         type: ApplicationCommandType.ChatInput,

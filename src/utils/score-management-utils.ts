@@ -21,7 +21,7 @@ export class ScoreManagementUtils {
             .sort((a: IOsuScore, b: IOsuScore) => b.pp - a.pp)[0];
 
         if (topExisting && topExisting.pp >= newScore.pp) {
-            return { rejected: { reason: 'existingHigher', existingScore: topExisting } };
+            return { event: { type: 'existingHigher', otherScore: topExisting } };
         }
 
         // Activate the new score
@@ -56,7 +56,7 @@ export class ScoreManagementUtils {
         // Determine if a snipe occurred: an existing top active score was replaced
         let event: any = { type: 'none' };
         if (topExisting && topAfter && topExisting._id !== topAfter._id) {
-            event = { type: 'sniped', snipedScore: topExisting };
+            event = { type: 'sniped', otherScore: topExisting };
         }
 
         return { event, affectedBeatmaps: Array.from(affectedBeatmaps) };

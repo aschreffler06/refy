@@ -14,6 +14,7 @@ import {
     // HelpCommand,
     // InfoCommand,
     LinkCommand,
+    PpCreateBountyCommand,
     PpCreateLeaderboardCommand,
     PpCreateMatchCommand,
     PpCreateTeamCommand,
@@ -22,7 +23,9 @@ import {
     PpGetScoreCommand,
     PpJoinTeamCommand,
     PpSetUpdatesChannelCommand,
+    PpSubmitBountyCommand,
     PpSubmitPlayCommand,
+    PpToggleSnipeNotifyCommand,
     PpUserStatsCommand,
     // TestCommand,
 } from './commands/chat/index.js';
@@ -96,6 +99,7 @@ async function start(): Promise<void> {
         // new AuctionTeamCommand(),
         // new CreateTicketCommand(),
         new LinkCommand(),
+        new PpCreateBountyCommand(),
         new PpCreateLeaderboardCommand(),
         new PpCreateMatchCommand(),
         new PpCreateTeamCommand(),
@@ -104,7 +108,9 @@ async function start(): Promise<void> {
         new PpGetScoreCommand(),
         new PpJoinTeamCommand(),
         new PpSetUpdatesChannelCommand(),
+        new PpSubmitBountyCommand(),
         new PpSubmitPlayCommand(),
+        new PpToggleSnipeNotifyCommand(),
         new PpUserStatsCommand(),
 
         // Message Context Commands

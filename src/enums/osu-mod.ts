@@ -1,5 +1,6 @@
 export enum OsuMod {
     NF = 'NF',
+    NM = 'NM',
     EZ = 'EZ',
     TD = 'TD',
     HD = 'HD',
@@ -14,4 +15,5 @@ export enum OsuMod {
     SO = 'SO',
     AP = 'AP',
     PF = 'PF',
+    FM = 'FM',
 }

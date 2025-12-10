@@ -1,5 +1,6 @@
 import { Model, model, Schema } from 'mongoose';
 
+import { bountySchema, IBounty } from './bounty.js';
 import { IOsuScore, IPlayer, osuScoreSchema, playerSchema } from './index.js';
 import { MatchStatus, OsuMode } from '../../enums/index.js';
 
@@ -38,12 +39,28 @@ const ppLeaderboardSchema = new Schema<IPpLeaderboard, unknown, PpLeaderboardDoc
     mode: { type: String, required: true, default: OsuMode.STANDARD },
 });
 
+// SCORE LEADERBOARD (single per match)
+// No rank restrictions — this leaderboard stores raw score-based entries for the event
+interface IPpScoreLeaderboard {
+    scores: IOsuScore[];
+    mode: OsuMode;
+}
+
+const ppScoreLeaderboardSchema = new Schema<IPpScoreLeaderboard>({
+    scores: { type: [osuScoreSchema], required: true },
+    mode: { type: String, required: true, default: OsuMode.STANDARD },
+});
+
 // MATCHES
 interface IPpMatch {
     name: string;
     guildId: string;
     teams: IPpTeam[];
     leaderboards: IPpLeaderboard[];
+    // baked-in single leaderboard that tracks raw score (rather than pp)
+    scoreLeaderboard: IPpScoreLeaderboard;
+    // embedded bounties for this match (optional)
+    bounties?: IBounty[];
     status: MatchStatus;
     // optional channel id where match updates should be posted
     updatesChannelId?: string;
@@ -52,6 +69,8 @@ interface IPpMatch {
 type PpMatchDocumentProps = {
     teams: IPpTeam[];
     leaderboards: IPpLeaderboard[];
+    scoreLeaderboard: IPpScoreLeaderboard;
+    bounties?: IBounty[];
 };
 
 interface IPpMatchMethods {
@@ -68,6 +87,14 @@ const ppMatchSchema = new Schema<IPpMatch, PpMatchModel, IPpMatchMethods, PpMatc
     guildId: { type: String, required: true },
     teams: { type: [ppTeamSchema], required: true },
     leaderboards: { type: [ppLeaderboardSchema], required: true },
+    // baked-in single score leaderboard (raw score ordering)
+    scoreLeaderboard: {
+        type: ppScoreLeaderboardSchema,
+        required: true,
+        default: { scores: [], mode: OsuMode.STANDARD },
+    },
+    // optional embedded bounties for the match
+    bounties: { type: [bountySchema], required: false, default: [] },
     status: { type: String, enum: Object.values(MatchStatus), default: MatchStatus.ACTIVE },
     updatesChannelId: { type: String, required: false },
 });

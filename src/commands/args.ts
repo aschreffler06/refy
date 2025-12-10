@@ -1,6 +1,6 @@
 import { APIApplicationCommandBasicOption, ApplicationCommandOptionType } from 'discord.js';
 
-import { HelpOption, InfoOption, OsuMode } from '../enums/index.js';
+import { BountyWinCondition, HelpOption, InfoOption, OsuMod, OsuMode } from '../enums/index.js';
 import { Language } from '../models/enum-helpers/index.js';
 import { Lang } from '../services/index.js';
 
@@ -72,11 +72,39 @@ export class Args {
         type: ApplicationCommandOptionType.Integer,
         required: true,
     };
-    public static readonly MATCH_NAME: APIApplicationCommandBasicOption = {
-        name: Lang.getRef('arguments.matchName', Language.Default),
-        description: Lang.getRef('argDescs.matchName', Language.Default),
+    public static readonly MAP_ID: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.mapId', Language.Default),
+        description: Lang.getRef('argDescs.mapId', Language.Default),
         type: ApplicationCommandOptionType.String,
         required: true,
+    };
+    public static readonly MOD: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.mod', Language.Default),
+        description: Lang.getRef('argDescs.mod', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: false,
+        choices: [
+            {
+                name: 'HD',
+                value: OsuMod.HD,
+            },
+            {
+                name: 'HR',
+                value: OsuMod.HR,
+            },
+            {
+                name: 'DT',
+                value: OsuMod.DT,
+            },
+            {
+                name: 'EZ',
+                value: OsuMod.EZ,
+            },
+            {
+                name: 'FM',
+                value: OsuMod.FM,
+            },
+        ],
     };
     public static readonly MODE: APIApplicationCommandBasicOption = {
         name: Lang.getRef('arguments.mode', Language.Default),
@@ -131,5 +159,39 @@ export class Args {
         description: Lang.getRef('argDescs.upperRank', Language.Default),
         type: ApplicationCommandOptionType.Integer,
         required: true,
+    };
+    public static readonly VALUE: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.value', Language.Default),
+        description: Lang.getRef('argDescs.value', Language.Default),
+        type: ApplicationCommandOptionType.Number,
+        required: true,
+    };
+    public static readonly WIN_CONDITION: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.winCondition', Language.Default),
+        description: Lang.getRef('argDescs.winCondition', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+        choices: [
+            {
+                name: 'Accuracy',
+                value: BountyWinCondition.ACCURACY,
+            },
+            {
+                name: 'Score',
+                value: BountyWinCondition.SCORE,
+            },
+            {
+                name: 'Miss Count',
+                value: BountyWinCondition.MISS_COUNT,
+            },
+            {
+                name: 'Pass',
+                value: BountyWinCondition.PASS,
+            },
+            {
+                name: 'Combo',
+                value: BountyWinCondition.COMBO,
+            },
+        ],
     };
 }

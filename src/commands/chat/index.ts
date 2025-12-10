@@ -19,3 +19,6 @@ export { PpJoinTeamCommand } from './pp-join-team-command.js';
 export { PpSetUpdatesChannelCommand } from './pp-set-updates-channel-command.js';
 export { PpSubmitPlayCommand } from './pp-submit-play-command.js';
 export { PpUserStatsCommand } from './pp-user-stats-command.js';
+export { PpToggleSnipeNotifyCommand } from './pp-toggle-snipe-notify-command.js';
+export { PpCreateBountyCommand } from './pp-create-bounty-command.js';
+export { PpSubmitBountyCommand } from './pp-submit-bounty-command.js';
