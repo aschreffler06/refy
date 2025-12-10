@@ -275,7 +275,7 @@ export class PpJoinTeamCommand implements Command {
                         [
                             timestamp,
                             String(player._id),
-                            intr.user.tag,
+                            intr.user.username,
                             timezone,
                             state ?? '',
                             team.name,
