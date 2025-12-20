@@ -13,6 +13,8 @@ const ppLeaderboardSchema = new Schema({
     mode: { type: String, required: true, default: OsuMode.STANDARD },
 });
 const ppScoreLeaderboardSchema = new Schema({
+    lowerRank: { type: Number, required: true },
+    upperRank: { type: Number, required: true },
     scores: { type: [osuScoreSchema], required: true },
     mode: { type: String, required: true, default: OsuMode.STANDARD },
 });
@@ -21,11 +23,9 @@ const ppMatchSchema = new Schema({
     guildId: { type: String, required: true },
     teams: { type: [ppTeamSchema], required: true },
     leaderboards: { type: [ppLeaderboardSchema], required: true },
-    // baked-in single score leaderboard (raw score ordering)
-    scoreLeaderboard: {
-        type: ppScoreLeaderboardSchema,
+    scoreLeaderboards: {
+        type: [ppScoreLeaderboardSchema],
         required: true,
-        default: { scores: [], mode: OsuMode.STANDARD },
     },
     // optional embedded bounties for the match
     bounties: { type: [bountySchema], required: false, default: [] },
@@ -44,6 +44,14 @@ ppMatchSchema.method('addLeaderboard', function addLeaderboard(lowerRank, upperR
         upperRank: upperRank,
         scores: [],
         mode: mode,
+    });
+});
+ppMatchSchema.method('addScoreLeaderboard', function addLeaderboard(lowerRank, upperRank) {
+    this.scoreLeaderboards.push({
+        lowerRank: lowerRank,
+        upperRank: upperRank,
+        scores: [],
+        mode: OsuMode.STANDARD,
     });
 });
 const PpMatch = model('PpMatch', ppMatchSchema);

@@ -33,15 +33,17 @@ export const ChatCommandMetadata = {
     //         },
     //     ],
     // },
-    // TEST: {
-    //     type: ApplicationCommandType.ChatInput,
-    //     name: Lang.getRef('chatCommands.test', Language.Default),
-    //     name_localizations: Lang.getRefLocalizationMap('chatCommands.test'),
-    //     description: Lang.getRef('commandDescs.test', Language.Default),
-    //     description_localizations: Lang.getRefLocalizationMap('commandDescs.test'),
-    //     dm_permission: true,
-    //     default_member_permissions: undefined,
-    // },
+    TEST: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.test', Language.Default),
+        name_localizations: Lang.getRefLocalizationMap('chatCommands.test'),
+        description: Lang.getRef('commandDescs.test', Language.Default),
+        description_localizations: Lang.getRefLocalizationMap('commandDescs.test'),
+        dm_permission: true,
+        default_member_permissions: PermissionsBitField.resolve([
+            PermissionFlagsBits.ManageGuild,
+        ]).toString(),
+    },
     // AUCTION_SETUP: {
     //     type: ApplicationCommandType.ChatInput,
     //     name: Lang.getRef('chatCommands.auctionSetup', Language.Default),
@@ -152,6 +154,14 @@ export const ChatCommandMetadata = {
             },
             {
                 ...Args.UPPER_RANK,
+                required: true,
+            },
+            {
+                ...Args.START_TIME,
+                required: true,
+            },
+            {
+                ...Args.END_TIME,
                 required: true,
             },
             {

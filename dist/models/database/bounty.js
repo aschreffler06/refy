@@ -8,6 +8,8 @@ const bountySchema = new Schema({
     beatmapId: { type: String, required: true },
     lowerRank: { type: Number, required: true },
     upperRank: { type: Number, required: true },
+    startTime: { type: Number, required: true },
+    endTime: { type: Number, required: true },
     mod: { type: String, required: true, enum: Object.values(OsuMod), default: OsuMod.NM },
     mode: { type: String, required: true, enum: Object.values(OsuMode), default: OsuMode.STANDARD },
     winningTeam: { type: String, required: false, default: null },

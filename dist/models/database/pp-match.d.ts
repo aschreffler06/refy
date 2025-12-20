@@ -37,6 +37,8 @@ interface IPpLeaderboard {
     mode: OsuMode;
 }
 interface IPpScoreLeaderboard {
+    lowerRank: number;
+    upperRank: number;
     scores: IOsuScore[];
     mode: OsuMode;
 }
@@ -45,7 +47,7 @@ interface IPpMatch {
     guildId: string;
     teams: IPpTeam[];
     leaderboards: IPpLeaderboard[];
-    scoreLeaderboard: IPpScoreLeaderboard;
+    scoreLeaderboards: IPpScoreLeaderboard[];
     bounties?: IBounty[];
     status: MatchStatus;
     updatesChannelId?: string;
@@ -53,12 +55,13 @@ interface IPpMatch {
 type PpMatchDocumentProps = {
     teams: IPpTeam[];
     leaderboards: IPpLeaderboard[];
-    scoreLeaderboard: IPpScoreLeaderboard;
+    scoreLeaderboards: IPpScoreLeaderboard[];
     bounties?: IBounty[];
 };
 interface IPpMatchMethods {
     addTeam: (teamName: string) => void;
     addLeaderboard: (lowerRank: number, upperRank: number, mode: OsuMode) => void;
+    addScoreLeaderboard: (lowerRank: number, upperRank: number, mode: OsuMode) => void;
 }
 type PpMatchModel = Model<IPpMatch, unknown, IPpMatchMethods>;
 type PpMatchModelType = Model<IPpMatch, unknown, PpMatchDocumentProps>;

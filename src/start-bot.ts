@@ -27,7 +27,7 @@ import {
     PpSubmitPlayCommand,
     PpToggleSnipeNotifyCommand,
     PpUserStatsCommand,
-    // TestCommand,
+    TestCommand,
 } from './commands/chat/index.js';
 import {
     ChatCommandMetadata,
@@ -89,7 +89,7 @@ async function start(): Promise<void> {
         // Chat Commands
         // new HelpCommand(),
         // new InfoCommand(),
-        // new TestCommand(),
+        new TestCommand(),
 
         // new AuctionBalanceCommand(),
         // new AuctionDisplayCommand(),

@@ -42,8 +42,10 @@ export class PpSubmitPlayCommand implements Command {
             return;
         }
 
+        const createdAt = Math.floor(new Date(play.createdAt).getTime());
+        console.log(createdAt);
         // TODO: write time range better later
-        if (play.createdAt < 1736136000 || play.createdAt > 17379468000) {
+        if (createdAt < 1766199600 || createdAt > 1768791600) {
             await InteractionUtils.send(intr, 'This play is not in the time range!');
             return;
         }
@@ -166,7 +168,12 @@ export class PpSubmitPlayCommand implements Command {
         score.teamName = team.name;
 
         // Add to score leaderboard
-        const scoreLb = match.scoreLeaderboard;
+        const playerRank = await Player.findById(score.userId)
+            .exec()
+            .then(p => p.rank);
+        const scoreLb = match.scoreLeaderboards.find(
+            lb => lb.mode === mode && lb.lowerRank <= playerRank && lb.upperRank >= playerRank
+        );
         if (scoreLb && scoreLb.mode === mode) {
             // find if score already exists and check the total score value
             const existingIndex = scoreLb.scores.findIndex(
@@ -185,21 +192,41 @@ export class PpSubmitPlayCommand implements Command {
         }
 
         // Apply PP multipliers BEFORE saving to database
-        if (score.mods.includes(OsuMod.EZ)) {
-            if (score.mods.includes(OsuMod.DT) || score.mods.includes(OsuMod.NC)) {
-                score.pp *= 1.2;
-            } else if (score.mods.includes(OsuMod.HT)) {
-                score.pp *= 1.6;
+        if (mode === OsuMode.STANDARD) {
+            if (score.mods.includes(OsuMod.EZ)) {
+                if (score.mods.includes(OsuMod.DT) || score.mods.includes(OsuMod.NC)) {
+                    score.pp *= 1.3;
+                } else if (score.mods.includes(OsuMod.HT)) {
+                    score.pp *= 1.6;
+                } else {
+                    score.pp *= 1.5;
+                }
             } else {
-                score.pp *= 1.5;
-            }
-        } else {
-            if (score.mods.includes(OsuMod.DT) || score.mods.includes(OsuMod.NC)) {
-                score.pp *= 0.9;
-            }
+                if (score.mods.includes(OsuMod.DT) || score.mods.includes(OsuMod.NC)) {
+                    score.pp *= 0.9;
+                }
 
-            if (score.mods.includes(OsuMod.HT)) {
-                score.pp *= 1.3;
+                if (score.mods.includes(OsuMod.HT)) {
+                    score.pp *= 1.3;
+                }
+            }
+        } else if (mode === OsuMode.TAIKO) {
+            if (score.mods.includes(OsuMod.HR)) {
+                if (score.mods.includes(OsuMod.HD)) {
+                    score.pp *= 1.1;
+                } else {
+                    score.pp *= 0.95;
+                }
+            }
+        } else if (mode === OsuMode.MANIA) {
+            if (score.mods.includes(OsuMod.EZ)) {
+                if (score.mods.includes(OsuMod.HT)) {
+                    score.pp *= 0.8;
+                } else {
+                    score.pp *= 0.9;
+                }
+            } else if (score.mods.includes(OsuMod.HT)) {
+                score.pp *= 0.9;
             }
         }
 

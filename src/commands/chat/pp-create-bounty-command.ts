@@ -30,9 +30,22 @@ export class PpCreateBountyCommand implements Command {
             ),
             mod: intr.options.getString(Lang.getRef('arguments.mod', Language.Default)),
             mode: intr.options.getString(Lang.getRef('arguments.mode', Language.Default)),
+            startTime: intr.options.getString(Lang.getRef('arguments.startTime', Language.Default)),
+            endTime: intr.options.getString(Lang.getRef('arguments.endTime', Language.Default)),
         };
         const mod = args.mod ? args.mod : 'NM';
         const mode = args.mode ? args.mode : 'STD';
+
+        // Convert MM/DD/YYYY HH:mm format to epoch seconds in UTC
+        const parseDateTime = (dateStr: string): number => {
+            const [datePart, timePart] = dateStr.split(' ');
+            const [month, day, year] = datePart.split('/').map(Number);
+            const [hours, minutes] = timePart.split(':').map(Number);
+            return Math.floor(Date.UTC(year, month - 1, day, hours, minutes) / 1000);
+        };
+
+        const startTime = parseDateTime(args.startTime);
+        const endTime = parseDateTime(args.endTime);
 
         const bounty = {
             _id: `${intr.guildId}-${Date.now()}`,
@@ -41,6 +54,8 @@ export class PpCreateBountyCommand implements Command {
             value: args.value,
             lowerRank: args.lowerRank,
             upperRank: args.upperRank,
+            startTime: startTime,
+            endTime: endTime,
             mod: mod,
             mode: mode,
             isActive: true,

@@ -193,4 +193,16 @@ Args.WIN_CONDITION = {
         },
     ],
 };
+Args.START_TIME = {
+    name: Lang.getRef('arguments.startTime', Language.Default),
+    description: Lang.getRef('argDescs.startTime', Language.Default),
+    type: ApplicationCommandOptionType.String,
+    required: true,
+};
+Args.END_TIME = {
+    name: Lang.getRef('arguments.endTime', Language.Default),
+    description: Lang.getRef('argDescs.endTime', Language.Default),
+    type: ApplicationCommandOptionType.String,
+    required: true,
+};
 //# sourceMappingURL=args.js.map

@@ -32,6 +32,8 @@ interface IBounty {
     beatmapId: string;
     lowerRank: number;
     upperRank: number;
+    startTime: number;
+    endTime: number;
     mod: OsuMod;
     mode: OsuMode;
     winningTeam: string | null;

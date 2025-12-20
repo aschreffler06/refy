@@ -42,11 +42,15 @@ const ppLeaderboardSchema = new Schema<IPpLeaderboard, unknown, PpLeaderboardDoc
 // SCORE LEADERBOARD (single per match)
 // No rank restrictions — this leaderboard stores raw score-based entries for the event
 interface IPpScoreLeaderboard {
+    lowerRank: number;
+    upperRank: number;
     scores: IOsuScore[];
     mode: OsuMode;
 }
 
 const ppScoreLeaderboardSchema = new Schema<IPpScoreLeaderboard>({
+    lowerRank: { type: Number, required: true },
+    upperRank: { type: Number, required: true },
     scores: { type: [osuScoreSchema], required: true },
     mode: { type: String, required: true, default: OsuMode.STANDARD },
 });
@@ -57,8 +61,7 @@ interface IPpMatch {
     guildId: string;
     teams: IPpTeam[];
     leaderboards: IPpLeaderboard[];
-    // baked-in single leaderboard that tracks raw score (rather than pp)
-    scoreLeaderboard: IPpScoreLeaderboard;
+    scoreLeaderboards: IPpScoreLeaderboard[];
     // embedded bounties for this match (optional)
     bounties?: IBounty[];
     status: MatchStatus;
@@ -69,13 +72,14 @@ interface IPpMatch {
 type PpMatchDocumentProps = {
     teams: IPpTeam[];
     leaderboards: IPpLeaderboard[];
-    scoreLeaderboard: IPpScoreLeaderboard;
+    scoreLeaderboards: IPpScoreLeaderboard[];
     bounties?: IBounty[];
 };
 
 interface IPpMatchMethods {
     addTeam: (teamName: string) => void;
     addLeaderboard: (lowerRank: number, upperRank: number, mode: OsuMode) => void;
+    addScoreLeaderboard: (lowerRank: number, upperRank: number, mode: OsuMode) => void;
 }
 
 type PpMatchModel = Model<IPpMatch, unknown, IPpMatchMethods>;
@@ -87,11 +91,9 @@ const ppMatchSchema = new Schema<IPpMatch, PpMatchModel, IPpMatchMethods, PpMatc
     guildId: { type: String, required: true },
     teams: { type: [ppTeamSchema], required: true },
     leaderboards: { type: [ppLeaderboardSchema], required: true },
-    // baked-in single score leaderboard (raw score ordering)
-    scoreLeaderboard: {
-        type: ppScoreLeaderboardSchema,
+    scoreLeaderboards: {
+        type: [ppScoreLeaderboardSchema],
         required: true,
-        default: { scores: [], mode: OsuMode.STANDARD },
     },
     // optional embedded bounties for the match
     bounties: { type: [bountySchema], required: false, default: [] },
@@ -118,6 +120,18 @@ ppMatchSchema.method(
             upperRank: upperRank,
             scores: [],
             mode: mode,
+        });
+    }
+);
+
+ppMatchSchema.method(
+    'addScoreLeaderboard',
+    function addLeaderboard(lowerRank: number, upperRank: number) {
+        this.scoreLeaderboards.push({
+            lowerRank: lowerRank,
+            upperRank: upperRank,
+            scores: [],
+            mode: OsuMode.STANDARD,
         });
     }
 );

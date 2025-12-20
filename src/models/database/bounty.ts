@@ -10,6 +10,8 @@ interface IBounty {
     beatmapId: string;
     lowerRank: number;
     upperRank: number;
+    startTime: number;
+    endTime: number;
     mod: OsuMod;
     mode: OsuMode;
     winningTeam: string | null;
@@ -23,6 +25,8 @@ const bountySchema = new Schema<IBounty>({
     beatmapId: { type: String, required: true },
     lowerRank: { type: Number, required: true },
     upperRank: { type: Number, required: true },
+    startTime: { type: Number, required: true },
+    endTime: { type: Number, required: true },
     mod: { type: String, required: true, enum: Object.values(OsuMod), default: OsuMod.NM },
     mode: { type: String, required: true, enum: Object.values(OsuMode), default: OsuMode.STANDARD },
     winningTeam: { type: String, required: false, default: null },

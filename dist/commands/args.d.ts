@@ -16,4 +16,6 @@ export declare class Args {
     static readonly UPPER_RANK: APIApplicationCommandBasicOption;
     static readonly VALUE: APIApplicationCommandBasicOption;
     static readonly WIN_CONDITION: APIApplicationCommandBasicOption;
+    static readonly START_TIME: APIApplicationCommandBasicOption;
+    static readonly END_TIME: APIApplicationCommandBasicOption;
 }

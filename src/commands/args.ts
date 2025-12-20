@@ -194,4 +194,16 @@ export class Args {
             },
         ],
     };
+    public static readonly START_TIME: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.startTime', Language.Default),
+        description: Lang.getRef('argDescs.startTime', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+    };
+    public static readonly END_TIME: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.endTime', Language.Default),
+        description: Lang.getRef('argDescs.endTime', Language.Default),
+        type: ApplicationCommandOptionType.String,
+        required: true,
+    };
 }
