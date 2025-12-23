@@ -72,12 +72,25 @@ export class PpLeaderboardUtils {
     }
     static getPlayerLeaderboard(player, leaderboards, mode = OsuMode.STANDARD) {
         let lb;
+        let rank;
+        if (mode === OsuMode.STANDARD) {
+            rank = player.rank;
+        }
+        else if (mode === OsuMode.TAIKO) {
+            rank = player.rankTaiko;
+        }
+        else if (mode === OsuMode.CATCH) {
+            rank = player.rankCatch;
+        }
+        else if (mode === OsuMode.MANIA) {
+            rank = player.rankMania;
+        }
         // find which rank range the player is in
         for (let i = 0; i < leaderboards.length; i++) {
             const leaderboard = leaderboards[i];
             if (mode === leaderboard.mode &&
-                player.rank >= leaderboard.lowerRank &&
-                player.rank <= leaderboard.upperRank) {
+                rank >= leaderboard.lowerRank &&
+                rank <= leaderboard.upperRank) {
                 lb = leaderboard;
             }
         }

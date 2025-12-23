@@ -159,7 +159,7 @@ export class PpSubmitBountyCommand {
                 break;
         }
         if (bountyWon) {
-            beatmapBounty.isActive = false;
+            // beatmapBounty.isActive = false;
             beatmapBounty.winningTeam = team.name;
             await match.save();
             await InteractionUtils.send(intr, `Congratulations! Your play has met the bounty condition for **${play.title} [${play.version}]**! The bounty is now claimed for your team **${team.name}**!`);

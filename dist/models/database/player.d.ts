@@ -28,6 +28,9 @@ interface IPlayer {
     username: string;
     discord: string;
     rank: number;
+    rankTaiko: number;
+    rankCatch: number;
+    rankMania: number;
     badges: number;
     accuracy: number;
     level: number;

@@ -35,7 +35,6 @@ export class PpSubmitPlayCommand {
             return;
         }
         const createdAt = Math.floor(new Date(play.createdAt).getTime());
-        console.log(createdAt);
         // TODO: write time range better later
         if (createdAt < 1766199600 || createdAt > 1768791600) {
             await InteractionUtils.send(intr, 'This play is not in the time range!');
@@ -43,6 +42,11 @@ export class PpSubmitPlayCommand {
         }
         if (play.status !== 'ranked' && play.status !== 'approved') {
             await InteractionUtils.send(intr, 'This beatmap is not ranked!');
+            return;
+        }
+        const bannedMaps = [1376308, 1127002]; //set ids
+        if (bannedMaps.includes(Number(play.beatmapSetId))) {
+            await InteractionUtils.send(intr, 'This beatmap set is banned from leaderboards');
             return;
         }
         let pp;
@@ -226,7 +230,7 @@ export class PpSubmitPlayCommand {
         const oldPp = ScoreManagementUtils.calculateTeamPp(currLeaderboard, score.teamName);
         // Let score management handle everything (including an early check for an existing higher score)
         const result = ScoreManagementUtils.manageActiveScoresOnAdd(currLeaderboard, score);
-        if (result.type === 'existingHigher') {
+        if (result.event.type === 'existingHigher') {
             const existing = result.event.otherScore;
             const existingPlayer = await Player.findOne({ _id: existing.userId }).exec();
             const embed = await PpLeaderboardUtils.createScoreEmbed(existingPlayer, existing, currLeaderboard);
@@ -240,7 +244,66 @@ export class PpSubmitPlayCommand {
         // Calculate new team pp using only active scores
         const newPp = ScoreManagementUtils.calculateTeamPp(currLeaderboard, score.teamName);
         const scoreEmbed = await PpLeaderboardUtils.createScoreEmbed(player, score, currLeaderboard, oldPp, newPp);
-        await match.save();
+        // Save with retry logic to handle concurrent updates
+        const maxRetries = 5;
+        let retryCount = 0;
+        let saved = false;
+        while (!saved && retryCount < maxRetries) {
+            try {
+                await match.save();
+                saved = true;
+            }
+            catch (error) {
+                if (error.name === 'VersionError' && retryCount < maxRetries - 1) {
+                    retryCount++;
+                    // Exponential backoff: wait 50ms, 100ms, 200ms, 400ms
+                    await new Promise(resolve => setTimeout(resolve, 50 * Math.pow(2, retryCount - 1)));
+                    // Re-fetch the document and re-apply the changes
+                    const freshMatch = await PpMatch.findOne({
+                        guildId: intr.guildId,
+                        status: MatchStatus.ACTIVE,
+                    }).exec();
+                    if (!freshMatch) {
+                        throw new Error('Match was deleted during save operation');
+                    }
+                    // Re-apply score to score leaderboards
+                    const freshScoreLb = freshMatch.scoreLeaderboards.find(lb => lb.mode === mode &&
+                        lb.lowerRank <= playerRank &&
+                        lb.upperRank >= playerRank);
+                    if (freshScoreLb && freshScoreLb.mode === mode) {
+                        const existingIndex = freshScoreLb.scores.findIndex(s => String(s._id) === String(score._id));
+                        if (existingIndex !== -1) {
+                            const existingScore = freshScoreLb.scores[existingIndex];
+                            if ((score.score ?? 0) > (existingScore.score ?? 0)) {
+                                freshScoreLb.scores.splice(existingIndex, 1);
+                                freshScoreLb.scores.push(score);
+                            }
+                        }
+                        else {
+                            freshScoreLb.scores.push(score);
+                        }
+                    }
+                    // Re-apply score to main leaderboards
+                    currLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, freshMatch.leaderboards, mode);
+                    if (!currLeaderboard) {
+                        throw new Error('Leaderboard disappeared during save operation');
+                    }
+                    ScoreManagementUtils.manageActiveScoresOnAdd(currLeaderboard, score);
+                    // Update match reference for next save attempt
+                    Object.assign(match, freshMatch);
+                }
+                else {
+                    throw error;
+                }
+            }
+        }
+        if (!saved) {
+            await InteractionUtils.send(intr, {
+                content: 'Failed to save score after multiple attempts. Please try again.',
+                ephemeral: true,
+            });
+            return;
+        }
         // Send appropriate message based on score-management's event (sniped etc.)
         let message = undefined;
         if (result &&

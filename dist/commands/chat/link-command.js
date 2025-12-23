@@ -20,6 +20,10 @@ export class LinkCommand {
         const userInfo = await osuService.getUser({
             username: args.name,
         });
+        const allRanks = await osuService.getUserAllModes({
+            username: args.name,
+        });
+        console.log(allRanks);
         const discordId = intr.user.id;
         const user = await Player.findById(userInfo.id).exec();
         if (!user) {
@@ -27,7 +31,10 @@ export class LinkCommand {
                 _id: userInfo.id,
                 username: userInfo.username,
                 discord: discordId,
-                rank: userInfo.rank,
+                rank: allRanks.osu,
+                rankTaiko: allRanks.taiko,
+                rankCatch: allRanks.fruits,
+                rankMania: allRanks.mania,
                 badges: userInfo.badges,
                 accuracy: userInfo.accuracy,
                 level: userInfo.level,
@@ -46,7 +53,18 @@ export class LinkCommand {
             user._id = userInfo.id;
             user.username = userInfo.username;
             user.discord = discordId;
-            user.rank = userInfo.rank;
+            if (user.rank == null) {
+                user.rank = allRanks.osu;
+            }
+            if (user.rankTaiko == null) {
+                user.rankTaiko = allRanks.taiko;
+            }
+            if (user.rankCatch == null) {
+                user.rankCatch = allRanks.fruits;
+            }
+            if (user.rankMania == null) {
+                user.rankMania = allRanks.mania;
+            }
             user.badges = userInfo.badges;
             user.accuracy = userInfo.accuracy;
             user.level = userInfo.level;

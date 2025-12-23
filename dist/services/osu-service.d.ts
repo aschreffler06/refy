@@ -4,7 +4,13 @@ import { OsuUserInfoDTO } from '../models/data-objects/osu-user-info-dto.js';
 export declare class OsuService {
     private osuEndpoint;
     private getAuthToken;
-    getUser({ id, username }: GetUserParams): Promise<OsuUserInfoDTO>;
+    getUser({ id, username, mode, }: GetUserParams): Promise<OsuUserInfoDTO>;
+    getUserAllModes({ id, username, }: GetUserParams): Promise<{
+        osu: number;
+        taiko: number;
+        fruits: number;
+        mania: number;
+    }>;
     /**
      * Does not include fails
      * @param discordId

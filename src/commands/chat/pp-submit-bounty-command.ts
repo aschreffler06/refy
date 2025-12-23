@@ -193,7 +193,7 @@ export class PpSubmitBountyCommand implements Command {
                 break;
         }
         if (bountyWon) {
-            beatmapBounty.isActive = false;
+            // beatmapBounty.isActive = false;
             beatmapBounty.winningTeam = team.name;
             await match.save();
             await InteractionUtils.send(

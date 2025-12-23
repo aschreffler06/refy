@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { MatchStatus } from '../../enums/index.js';
+import { MatchStatus, OsuMod, OsuMode } from '../../enums/index.js';
 import { PpMatch } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
@@ -33,8 +33,8 @@ export class PpCreateBountyCommand implements Command {
             startTime: intr.options.getString(Lang.getRef('arguments.startTime', Language.Default)),
             endTime: intr.options.getString(Lang.getRef('arguments.endTime', Language.Default)),
         };
-        const mod = args.mod ? args.mod : 'NM';
-        const mode = args.mode ? args.mode : 'STD';
+        const mod = args.mod ? args.mod : OsuMod.NM;
+        const mode = args.mode ? args.mode : OsuMode.STANDARD;
 
         // Convert MM/DD/YYYY HH:mm format to epoch seconds in UTC
         const parseDateTime = (dateStr: string): number => {

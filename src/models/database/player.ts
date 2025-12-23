@@ -6,6 +6,9 @@ interface IPlayer {
     username: string;
     discord: string;
     rank: number;
+    rankTaiko: number;
+    rankCatch: number;
+    rankMania: number;
     badges: number;
     accuracy: number;
     level: number;
@@ -20,7 +23,10 @@ const playerSchema = new Schema<IPlayer>({
     _id: { type: Number, required: true },
     username: { type: String, required: true },
     discord: { type: String, required: true },
-    rank: { type: Number, required: true },
+    rank: { type: Number, required: false },
+    rankTaiko: { type: Number, required: false },
+    rankCatch: { type: Number, required: false },
+    rankMania: { type: Number, required: false },
     badges: { type: Number, required: true },
     accuracy: { type: Number, required: true },
     level: { type: Number, required: true },

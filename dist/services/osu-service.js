@@ -38,7 +38,7 @@ export class OsuService {
             throw new Error('Failed to get osu! API token');
         }
     }
-    async getUser({ id = null, username = null }) {
+    async getUser({ id = null, username = null, mode = null, }) {
         const token = await this.getAuthToken();
         if (!token) {
             throw new Error('Failed to authenticate with osu! API');
@@ -48,12 +48,17 @@ export class OsuService {
         };
         let user;
         try {
+            let url;
             if (id) {
-                user = await axios.get(`${this.osuEndpoint}/users/${id}`, config);
+                url = `${this.osuEndpoint}/users/${id}`;
             }
             else {
-                user = await axios.get(`${this.osuEndpoint}/users/${username}`, config);
+                url = `${this.osuEndpoint}/users/${username}`;
             }
+            if (mode) {
+                url += `/${mode}`;
+            }
+            user = await axios.get(url, config);
         }
         catch (err) {
             console.log('Error fetching user:', err);
@@ -61,6 +66,21 @@ export class OsuService {
         }
         const data = user.data;
         return new OsuUserInfoDTO(data.id, data.username, data.statistics.global_rank, data.badges.length, data.statistics.hit_accuracy, data.statistics.level.current, data.statistics.play_count, data.statistics.play_time, data.avatar_url);
+    }
+    async getUserAllModes({ id = null, username = null, }) {
+        const modes = ['osu', 'taiko', 'fruits', 'mania'];
+        const ranks = {};
+        for (const mode of modes) {
+            try {
+                const user = await this.getUser({ id, username, mode });
+                ranks[mode] = user.rank;
+            }
+            catch (err) {
+                console.log(`Error fetching rank for mode ${mode}:`, err);
+                ranks[mode] = 0;
+            }
+        }
+        return ranks;
     }
     /**
      * Does not include fails

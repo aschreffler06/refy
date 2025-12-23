@@ -25,6 +25,10 @@ export class LinkCommand implements Command {
         const userInfo: OsuUserInfoDTO = await osuService.getUser({
             username: args.name,
         });
+        const allRanks = await osuService.getUserAllModes({
+            username: args.name,
+        });
+        console.log(allRanks);
 
         const discordId = intr.user.id;
 
@@ -34,7 +38,10 @@ export class LinkCommand implements Command {
                 _id: userInfo.id,
                 username: userInfo.username,
                 discord: discordId,
-                rank: userInfo.rank,
+                rank: allRanks.osu,
+                rankTaiko: allRanks.taiko,
+                rankCatch: allRanks.fruits,
+                rankMania: allRanks.mania,
                 badges: userInfo.badges,
                 accuracy: userInfo.accuracy,
                 level: userInfo.level,
@@ -52,7 +59,18 @@ export class LinkCommand implements Command {
             user._id = userInfo.id;
             user.username = userInfo.username;
             user.discord = discordId;
-            user.rank = userInfo.rank;
+            if (user.rank == null) {
+                user.rank = allRanks.osu;
+            }
+            if (user.rankTaiko == null) {
+                user.rankTaiko = allRanks.taiko;
+            }
+            if (user.rankCatch == null) {
+                user.rankCatch = allRanks.fruits;
+            }
+            if (user.rankMania == null) {
+                user.rankMania = allRanks.mania;
+            }
             user.badges = userInfo.badges;
             user.accuracy = userInfo.accuracy;
             user.level = userInfo.level;
