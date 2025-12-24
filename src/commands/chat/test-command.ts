@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
+// import { OsuMode } from '../../enums/index.js';
 import { PpMatch } from '../../models/database/pp-match.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
@@ -15,14 +16,16 @@ export class TestCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
-        const match = await PpMatch.findOne({ name: 'osu! Civil War' }).exec();
-        for (const lb of match.scoreLeaderboards) {
-            for (const score of lb.scores) {
-                if (score.beatmapId === '370440') {
-                    console.log(score);
-                }
-            }
-        }
+        const match = await PpMatch.findOne({ name: 'Test' }).exec();
+        // const CWmatch = await PpMatch.findOne({ name: 'osu! Civil War' }).exec();
+        // for (const lb of match.scoreLeaderboards) {
+        //     for (const score of lb.scores) {
+        //         if (score.beatmapId === '370440') {
+        //             console.log(score);
+        //         }
+        //     }
+        // }
+
         // let mapsSeen = new Map<string, number>();
         // for (const lb of match.leaderboards) {
         //     for (const score of lb.scores) {
@@ -38,7 +41,20 @@ export class TestCommand implements Command {
         //         }
         //     }
         // }
-        // await match.save();
+
+        // const leaderboards = CWmatch.scoreLeaderboards;
+        // for (const lb of leaderboards) {
+        //     if (lb.scores.length === 0) {
+        //         // delete the lbs
+        //         CWmatch.scoreLeaderboards = CWmatch.scoreLeaderboards.filter(l => l !== lb);
+        //     }
+        // }
+        // console.log(CWmatch.scoreLeaderboards);
+        // CWmatch.save();
+
+        // match.addScoreLeaderboard(1, 1000, OsuMode.STANDARD);
+        // match.addScoreLeaderboard(1001, 10000, OsuMode.STANDARD);
+        await match.save();
         await InteractionUtils.send(intr, Lang.getEmbed('displayEmbeds.test', data.lang));
     }
 }

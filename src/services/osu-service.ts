@@ -133,7 +133,7 @@ export class OsuService {
         let recentPlays;
         try {
             recentPlays = await axios.get(
-                `${this.osuEndpoint}/users/${osuId}/scores/recent?limit=25&mode=${mode}`,
+                `${this.osuEndpoint}/users/${osuId}/scores/recent?limit=30&mode=${mode}`,
                 config
             );
         } catch (err) {

@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 
+import { IOsuScore } from './index.js';
 import { BountyWinCondition, OsuMod, OsuMode } from '../../enums/index.js';
 
 interface IBounty {
@@ -15,6 +16,7 @@ interface IBounty {
     mod: OsuMod;
     mode: OsuMode;
     winningTeam: string | null;
+    scores: IOsuScore[];
 }
 
 const bountySchema = new Schema<IBounty>({
@@ -30,6 +32,11 @@ const bountySchema = new Schema<IBounty>({
     mod: { type: String, required: true, enum: Object.values(OsuMod), default: OsuMod.NM },
     mode: { type: String, required: true, enum: Object.values(OsuMode), default: OsuMode.STANDARD },
     winningTeam: { type: String, required: false, default: null },
+    scores: {
+        type: [{ type: String, ref: 'OsuScore' }],
+        required: true,
+        default: [],
+    },
 });
 
 const Bounty = model('Bounty', bountySchema);

@@ -193,17 +193,127 @@ export class PpSubmitBountyCommand implements Command {
                 break;
         }
         if (bountyWon) {
+            let scores = beatmapBounty.scores;
             // beatmapBounty.isActive = false;
-            beatmapBounty.winningTeam = team.name;
+
+            // Check if player already has a score submitted
+            const existingScoreIndex = scores.findIndex(s => s.userId === player._id.toString());
+            let shouldAddScore = true;
+
+            if (existingScoreIndex !== -1) {
+                const existingScore = scores[existingScoreIndex];
+                let isNewScoreBetter = false;
+
+                // Compare based on win condition
+                switch (beatmapBounty.winCondition) {
+                    case BountyWinCondition.ACCURACY:
+                        isNewScoreBetter =
+                            score.accuracy > existingScore.accuracy ||
+                            (score.accuracy === existingScore.accuracy &&
+                                score.created_at < existingScore.created_at);
+                        break;
+                    case BountyWinCondition.SCORE:
+                        isNewScoreBetter =
+                            score.score > existingScore.score ||
+                            (score.score === existingScore.score &&
+                                score.created_at < existingScore.created_at);
+                        break;
+                    case BountyWinCondition.MISS_COUNT:
+                        isNewScoreBetter =
+                            score.countMiss < existingScore.countMiss ||
+                            (score.countMiss === existingScore.countMiss &&
+                                score.created_at < existingScore.created_at);
+                        break;
+                    case BountyWinCondition.PASS:
+                        isNewScoreBetter = score.created_at < existingScore.created_at;
+                        break;
+                    case BountyWinCondition.COMBO:
+                        isNewScoreBetter =
+                            score.maxCombo > existingScore.maxCombo ||
+                            (score.maxCombo === existingScore.maxCombo &&
+                                score.created_at < existingScore.created_at);
+                        break;
+                }
+
+                if (isNewScoreBetter) {
+                    // Remove the old score
+                    scores.splice(existingScoreIndex, 1);
+                } else {
+                    // Don't add the new score
+                    shouldAddScore = false;
+                }
+            }
+
+            if (shouldAddScore) {
+                switch (beatmapBounty.winCondition) {
+                    case BountyWinCondition.ACCURACY:
+                        // add bounty to scores and cut anything after the 11th sorted by accuracy descending
+                        scores.push(score);
+                        scores.sort((a, b) => {
+                            const diff = b.accuracy - a.accuracy;
+                            if (diff !== 0) return diff;
+                            return a.created_at - b.created_at;
+                        });
+                        break;
+                    case BountyWinCondition.SCORE:
+                        scores.push(score);
+                        scores.sort((a, b) => {
+                            const diff = b.score - a.score;
+                            if (diff !== 0) return diff;
+                            return a.created_at - b.created_at;
+                        });
+                        break;
+                    case BountyWinCondition.MISS_COUNT:
+                        scores.push(score);
+                        scores.sort((a, b) => {
+                            const diff = a.countMiss - b.countMiss;
+                            if (diff !== 0) return diff;
+                            return a.created_at - b.created_at;
+                        });
+                        break;
+                    case BountyWinCondition.PASS:
+                        scores.push(score);
+                        scores.sort((a, b) => {
+                            const diff = a.created_at - b.created_at;
+                            return diff;
+                        });
+                        break;
+                    case BountyWinCondition.COMBO:
+                        scores.push(score);
+                        scores.sort((a, b) => {
+                            const diff = b.maxCombo - a.maxCombo;
+                            if (diff !== 0) return diff;
+                            return a.created_at - b.created_at;
+                        });
+                        break;
+                }
+                console.log(scores);
+                if (scores.length > 11) {
+                    scores = scores.slice(0, 11);
+                }
+
+                if (!scores.includes(score)) {
+                    await InteractionUtils.send(
+                        intr,
+                        `Your play was good enough to meet the bounty condition, but not high enough to be in the top 11 for this bounty`
+                    );
+                    return;
+                }
+            }
+            beatmapBounty.winningTeam = scores[0].teamName;
             await match.save();
             await InteractionUtils.send(
                 intr,
-                `Congratulations! Your play has met the bounty condition for **${play.title} [${play.version}]**! The bounty is now claimed for your team **${team.name}**!`
+                `Congratulations! Your play has met the bounty condition for **${play.title} [${
+                    play.version
+                }]**! The bounty is now claimed for your team **${team.name}** at #${
+                    scores.indexOf(score) + 1
+                } on the leaderboard.`
             );
         } else {
             await InteractionUtils.send(
                 intr,
-                `Your play did not meet the bounty condition for **${play.title} [${play.version}]**. Better luck next time!`
+                `Your play did not meet the bounty condition for **${play.title} [${play.version}]**. Better luck next time.`
             );
         }
     }
