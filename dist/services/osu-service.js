@@ -106,7 +106,7 @@ export class OsuService {
         const osuId = osu._id;
         let recentPlays;
         try {
-            recentPlays = await axios.get(`${this.osuEndpoint}/users/${osuId}/scores/recent?limit=25&mode=${mode}`, config);
+            recentPlays = await axios.get(`${this.osuEndpoint}/users/${osuId}/scores/recent?limit=30&mode=${mode}`, config);
         }
         catch (err) {
             console.log('Error fetching recent plays:', err);

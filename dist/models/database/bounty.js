@@ -13,6 +13,11 @@ const bountySchema = new Schema({
     mod: { type: String, required: true, enum: Object.values(OsuMod), default: OsuMod.NM },
     mode: { type: String, required: true, enum: Object.values(OsuMode), default: OsuMode.STANDARD },
     winningTeam: { type: String, required: false, default: null },
+    scores: {
+        type: [{ type: String, ref: 'OsuScore' }],
+        required: true,
+        default: [],
+    },
 });
 const Bounty = model('Bounty', bountySchema);
 export { Bounty, bountySchema };

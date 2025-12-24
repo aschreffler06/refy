@@ -23,6 +23,7 @@
 /// <reference types="mongoose/types/virtuals.js" />
 /// <reference types="mongoose/types/inferschematype.js" />
 import { Schema } from 'mongoose';
+import { IOsuScore } from './index.js';
 import { BountyWinCondition, OsuMod, OsuMode } from '../../enums/index.js';
 interface IBounty {
     _id: string;
@@ -37,6 +38,7 @@ interface IBounty {
     mod: OsuMod;
     mode: OsuMode;
     winningTeam: string | null;
+    scores: IOsuScore[];
 }
 declare const bountySchema: Schema<IBounty, import("mongoose").Model<IBounty, any, any, any, import("mongoose").Document<unknown, any, IBounty> & IBounty & Required<{
     _id: string;
