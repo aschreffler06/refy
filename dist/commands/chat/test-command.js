@@ -1,10 +1,11 @@
 import { RateLimiter } from 'discord.js-rate-limiter';
 // import { OsuMode } from '../../enums/index.js';
 // import { OsuScore } from '../../models/database/index.js';
+import { OsuMode } from '../../enums/index.js';
 import { PpMatch } from '../../models/database/pp-match.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { Lang } from '../../services/index.js';
-import { InteractionUtils } from '../../utils/index.js';
+import { InteractionUtils, ScoreManagementUtils } from '../../utils/index.js';
 import { CommandDeferType } from '../index.js';
 export class TestCommand {
     constructor() {
@@ -31,14 +32,27 @@ export class TestCommand {
         //     }
         // }
         // await match.save();
-        const lbs = match.scoreLeaderboards;
-        console.log(lbs);
-        for (const lb of lbs) {
-            for (const s of lb.scores) {
-                if (s.beatmapId === '1256809')
-                    console.log(s);
-            }
+        const lbs = match.leaderboards;
+        const userId = '21587761';
+        // Find the source leaderboard (5000-999999)
+        const sourceLb = lbs.find(lb => lb.mode === OsuMode.MANIA && lb.lowerRank === 5000 && lb.upperRank === 999999);
+        // Find the target leaderboard (1000-4999)
+        const targetLb = lbs.find(lb => lb.mode === OsuMode.MANIA && lb.lowerRank === 1000 && lb.upperRank === 4999);
+        if (!sourceLb || !targetLb) {
+            await InteractionUtils.send(intr, 'Leaderboards not found!');
+            return;
         }
+        // Find and collect scores to move
+        const scoresToMove = sourceLb.scores.filter((s) => s.userId === userId);
+        console.log(`Moving ${scoresToMove.length} scores from ${sourceLb.lowerRank}-${sourceLb.upperRank} to ${targetLb.lowerRank}-${targetLb.upperRank}`);
+        // Remove scores from source leaderboard
+        sourceLb.scores = sourceLb.scores.filter((s) => s.userId !== userId);
+        // Add scores to target leaderboard using ScoreManagementUtils
+        for (const score of scoresToMove) {
+            ScoreManagementUtils.manageActiveScoresOnAdd(targetLb, score);
+        }
+        await match.save();
+        await InteractionUtils.send(intr, `Moved ${scoresToMove.length} scores for user ${userId}`);
         await InteractionUtils.send(intr, Lang.getEmbed('displayEmbeds.test', data.lang));
     }
 }
