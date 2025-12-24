@@ -22,21 +22,7 @@ export class PpDisplayCommand {
             guildId: intr.guildId,
             status: MatchStatus.ACTIVE,
         }).exec();
-        if (!match) {
-            await InteractionUtils.send(intr, {
-                content: 'There is no active match in progress for this server!',
-                ephemeral: true,
-            });
-            return;
-        }
         const player = await Player.findOne({ discord: intr.user.id }).exec();
-        if (!player) {
-            await InteractionUtils.send(intr, {
-                content: 'You are not linked! Use /link to link your osu! account.',
-                ephemeral: true,
-            });
-            return;
-        }
         const leaderboards = match.leaderboards;
         const currentLeaderboard = PpLeaderboardUtils.getPlayerLeaderboard(player, leaderboards, mode);
         if (!currentLeaderboard) {
