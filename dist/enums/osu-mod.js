@@ -17,5 +17,6 @@ export var OsuMod;
     OsuMod["AP"] = "AP";
     OsuMod["PF"] = "PF";
     OsuMod["FM"] = "FM";
+    OsuMod["FoM"] = "FoM";
 })(OsuMod || (OsuMod = {}));
 //# sourceMappingURL=osu-mod.js.map

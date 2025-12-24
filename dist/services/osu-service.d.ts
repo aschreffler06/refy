@@ -18,6 +18,7 @@ export declare class OsuService {
      * @returns
      */
     getRecentPlays(discordId: string, mode?: OsuMode | string): Promise<OsuScoreDTO[]>;
+    getScore(scoreId: string): Promise<OsuScoreDTO>;
     getBeatmapCombo(beatmapId: string): Promise<number>;
     getBeatmapDifficulty(beatmapId: string): Promise<number>;
     getBeatmapModdedDifficulty(beatmapId: string, mods: string[]): Promise<number>;

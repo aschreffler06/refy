@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 // import { OsuMode } from '../../enums/index.js';
+// import { OsuScore } from '../../models/database/index.js';
 import { PpMatch } from '../../models/database/pp-match.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
@@ -16,45 +17,31 @@ export class TestCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
-        const match = await PpMatch.findOne({ name: 'Test' }).exec();
-        // const CWmatch = await PpMatch.findOne({ name: 'osu! Civil War' }).exec();
-        // for (const lb of match.scoreLeaderboards) {
-        //     for (const score of lb.scores) {
-        //         if (score.beatmapId === '370440') {
-        //             console.log(score);
+        const match = await PpMatch.findOne({ name: 'osu! Civil War' }).exec();
+        // const osuService = new OsuService();
+        // let scoreIdsToAdd = [];
+        // let scores = [];
+        // for (let i = 0; i < 10; i++) {
+        //     const score = await osuService.getScore(scoreIdsToAdd[i]);
+        //     scores.push(score);
+        // }
+        // // find the bounty that has the id of the scores
+        // for (const bounty of match.bounties) {
+        //     for (const score of scores) {
+        //         if (bounty.beatmapId === score.beatmapId.toString()) {
+        //             bounty.scores.push(score);
         //         }
         //     }
         // }
 
-        // let mapsSeen = new Map<string, number>();
-        // for (const lb of match.leaderboards) {
-        //     for (const score of lb.scores) {
-        //         if (mapsSeen.has(score.beatmapSetId)) {
-        //             const existingPp = mapsSeen.get(score.beatmapSetId);
-        //             if (score.pp > existingPp) {
-        //                 // const currMap = mapsSeen.get(score.beatmapSetId);
-        //                 // currMap.isActive = false;
-        //                 mapsSeen.set(score.beatmapSetId, score.pp);
-        //             }
-        //         } else {
-        //             mapsSeen.set(score.beatmapSetId, score.pp);
-        //         }
-        //     }
-        // }
-
-        // const leaderboards = CWmatch.scoreLeaderboards;
-        // for (const lb of leaderboards) {
-        //     if (lb.scores.length === 0) {
-        //         // delete the lbs
-        //         CWmatch.scoreLeaderboards = CWmatch.scoreLeaderboards.filter(l => l !== lb);
-        //     }
-        // }
-        // console.log(CWmatch.scoreLeaderboards);
-        // CWmatch.save();
-
-        // match.addScoreLeaderboard(1, 1000, OsuMode.STANDARD);
-        // match.addScoreLeaderboard(1001, 10000, OsuMode.STANDARD);
-        await match.save();
+        // await match.save();
+        const lbs = match.scoreLeaderboards;
+        console.log(lbs);
+        for (const lb of lbs) {
+            for (const s of lb.scores) {
+                if (s.beatmapId === '1256809') console.log(s);
+            }
+        }
         await InteractionUtils.send(intr, Lang.getEmbed('displayEmbeds.test', data.lang));
     }
 }

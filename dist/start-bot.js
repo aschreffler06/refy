@@ -11,7 +11,7 @@ import {
 // CreateTicketCommand,
 // HelpCommand,
 // InfoCommand,
-LinkCommand, PpCreateBountyCommand, PpCreateLeaderboardCommand, PpCreateMatchCommand, PpCreateTeamCommand, PpDisplayCommand, PpDisplayTotalCommand, PpGetScoreCommand, PpJoinTeamCommand, PpSetUpdatesChannelCommand, PpSubmitBountyCommand, PpSubmitPlayCommand, PpToggleSnipeNotifyCommand, PpUserStatsCommand, TestCommand, } from './commands/chat/index.js';
+LinkCommand, PpBountyScoresCommand, PpCreateBountyCommand, PpCreateLeaderboardCommand, PpCreateMatchCommand, PpCreateTeamCommand, PpDisplayCommand, PpDisplayTotalCommand, PpGetScoreCommand, PpJoinTeamCommand, PpSetUpdatesChannelCommand, PpSubmitBountyCommand, PpSubmitPlayCommand, PpToggleSnipeNotifyCommand, PpUserStatsCommand, TestCommand, } from './commands/chat/index.js';
 import { ChatCommandMetadata, MessageCommandMetadata, UserCommandMetadata, } from './commands/index.js';
 import { ViewDateSent } from './commands/message/index.js';
 import { ViewDateJoined } from './commands/user/index.js';
@@ -55,6 +55,7 @@ async function start() {
         // new AuctionTeamCommand(),
         // new CreateTicketCommand(),
         new LinkCommand(),
+        new PpBountyScoresCommand(),
         new PpCreateBountyCommand(),
         new PpCreateLeaderboardCommand(),
         new PpCreateMatchCommand(),

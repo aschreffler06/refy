@@ -15,5 +15,6 @@ export declare enum OsuMod {
     SO = "SO",
     AP = "AP",
     PF = "PF",
-    FM = "FM"
+    FM = "FM",
+    FoM = "FoM"
 }

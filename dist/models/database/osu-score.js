@@ -10,7 +10,7 @@ const osuScoreSchema = new Schema({
     maxCombo: { type: Number, required: true },
     beatmapMaxCombo: { type: Number, required: true },
     difficulty: { type: Number, required: true },
-    pp: { type: Number, required: true },
+    pp: { type: Number, required: false },
     rank: { type: String, required: true },
     score: { type: Number, required: true },
     mods: { type: [String], required: true },

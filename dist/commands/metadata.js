@@ -298,6 +298,19 @@ export const ChatCommandMetadata = {
             },
         ],
     },
+    PP_BOUNTY_SCORES: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.ppBountyScores', Language.Default),
+        description: Lang.getRef('commandDescs.ppBountyScores', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+        options: [
+            {
+                ...Args.MAP_ID,
+                required: true,
+            },
+        ],
+    },
     PP_SUBMIT_BOUNTY: {
         type: ApplicationCommandType.ChatInput,
         name: Lang.getRef('chatCommands.ppSubmitBounty', Language.Default),

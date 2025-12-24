@@ -174,6 +174,52 @@ export class OsuService {
         return scores;
     }
 
+    public async getScore(scoreId: string): Promise<OsuScoreDTO> {
+        const token = await this.getAuthToken();
+        if (!token) {
+            throw new Error('Failed to authenticate with osu! API');
+        }
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
+        };
+
+        let scoreData;
+        try {
+            scoreData = await axios.get(`${this.osuEndpoint}/scores/${scoreId}`, config);
+        } catch (err) {
+            console.log('Error fetching score:', err);
+            throw new Error('Failed to fetch score from osu! API');
+        }
+
+        const play = scoreData.data;
+        return new OsuScoreDTO(
+            play.id,
+            play.user.id,
+            play.accuracy,
+            play.statistics.count_300,
+            play.statistics.count_100,
+            play.statistics.count_50,
+            play.statistics.count_miss,
+            play.max_combo,
+            await this.getBeatmapCombo(play.beatmap.id),
+            await this.getBeatmapModdedDifficulty(play.beatmap.id, play.mods),
+            play.pp,
+            play.rank,
+            play.score,
+            play.mods,
+            Math.trunc(new Date(play.created_at).getTime() / 1000),
+            play.mode,
+            play.passed,
+            play.beatmap.beatmapset_id,
+            play.beatmap.id,
+            play.beatmap.status,
+            play.beatmapset.title,
+            play.beatmap.version,
+            play.beatmap.url,
+            play.beatmapset.covers.list
+        );
+    }
+
     public async getBeatmapCombo(beatmapId: string): Promise<number> {
         const token = await this.getAuthToken();
         const config = {

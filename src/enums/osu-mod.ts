@@ -16,4 +16,5 @@ export enum OsuMod {
     AP = 'AP',
     PF = 'PF',
     FM = 'FM',
+    FoM = 'FoM', //force mod
 }

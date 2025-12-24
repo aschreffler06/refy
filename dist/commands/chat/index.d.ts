@@ -22,3 +22,4 @@ export { PpUserStatsCommand } from './pp-user-stats-command.js';
 export { PpToggleSnipeNotifyCommand } from './pp-toggle-snipe-notify-command.js';
 export { PpCreateBountyCommand } from './pp-create-bounty-command.js';
 export { PpSubmitBountyCommand } from './pp-submit-bounty-command.js';
+export { PpBountyScoresCommand } from './pp-bounty-scores-command.js';

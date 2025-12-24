@@ -1,7 +1,7 @@
 import { GuildChannel, ThreadChannel, } from 'discord.js';
+import { FormatUtils, InteractionUtils } from './index.js';
 import { Permission } from '../models/enum-helpers/index.js';
 import { Lang } from '../services/index.js';
-import { FormatUtils, InteractionUtils } from './index.js';
 export class CommandUtils {
     static findCommand(commands, commandParts) {
         let found = [...commands];
