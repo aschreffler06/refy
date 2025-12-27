@@ -183,7 +183,7 @@ export class PpSubmitPlayCommand implements Command {
         if (scoreLb && scoreLb.mode === mode) {
             // find if score already exists and check the total score value
             const existingIndex = scoreLb.scores.findIndex(
-                s => String(s._id) === String(score._id)
+                s => String(s.beatmapId) === String(score.beatmapId)
             );
             if (existingIndex !== -1) {
                 const existingScore = scoreLb.scores[existingIndex];
@@ -196,7 +196,6 @@ export class PpSubmitPlayCommand implements Command {
                 scoreLb.scores.push(score);
             }
         }
-
         // Apply PP multipliers BEFORE saving to database
         if (mode === OsuMode.STANDARD) {
             if (score.mods.includes(OsuMod.EZ)) {
@@ -253,22 +252,6 @@ export class PpSubmitPlayCommand implements Command {
         // Let score management handle everything (including an early check for an existing higher score)
         const result: any = ScoreManagementUtils.manageActiveScoresOnAdd(currLeaderboard, score);
 
-        if (result.event.type === 'existingHigher') {
-            const existing = result.event.otherScore;
-            const existingPlayer = await Player.findOne({ _id: existing.userId }).exec();
-            const embed = await PpLeaderboardUtils.createScoreEmbed(
-                existingPlayer,
-                existing,
-                currLeaderboard
-            );
-            await InteractionUtils.send(intr, {
-                content: 'There is already a higher score on this beatmap set on the leaderboard.',
-                ephemeral: true,
-                embeds: [embed],
-            });
-            return;
-        }
-
         // Calculate new team pp using only active scores
         const newPp = ScoreManagementUtils.calculateTeamPp(currLeaderboard, score.teamName);
 
@@ -316,7 +299,7 @@ export class PpSubmitPlayCommand implements Command {
                     );
                     if (freshScoreLb && freshScoreLb.mode === mode) {
                         const existingIndex = freshScoreLb.scores.findIndex(
-                            s => String(s._id) === String(score._id)
+                            s => String(s.beatmapId) === String(score.beatmapId)
                         );
                         if (existingIndex !== -1) {
                             const existingScore = freshScoreLb.scores[existingIndex];
@@ -352,6 +335,22 @@ export class PpSubmitPlayCommand implements Command {
             await InteractionUtils.send(intr, {
                 content: 'Failed to save score after multiple attempts. Please try again.',
                 ephemeral: true,
+            });
+            return;
+        }
+
+        if (result.event.type === 'existingHigher') {
+            const existing = result.event.otherScore;
+            const existingPlayer = await Player.findOne({ _id: existing.userId }).exec();
+            const embed = await PpLeaderboardUtils.createScoreEmbed(
+                existingPlayer,
+                existing,
+                currLeaderboard
+            );
+            await InteractionUtils.send(intr, {
+                content: 'There is already a higher score on this beatmap set on the leaderboard.',
+                ephemeral: true,
+                embeds: [embed],
             });
             return;
         }

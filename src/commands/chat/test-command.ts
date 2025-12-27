@@ -1,14 +1,10 @@
 import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-// import { OsuMode } from '../../enums/index.js';
-// import { OsuScore } from '../../models/database/index.js';
-import { OsuMode } from '../../enums/index.js';
-import { PpMatch } from '../../models/database/pp-match.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
-import { InteractionUtils, ScoreManagementUtils } from '../../utils/index.js';
+import { InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 
 export class TestCommand implements Command {
@@ -18,59 +14,44 @@ export class TestCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
-        const match = await PpMatch.findOne({ name: 'osu! Civil War' }).exec();
+        // const match = await PpMatch.findOne({ name: 'osu! Civil War' }).exec();
         // const osuService = new OsuService();
-        // let scoreIdsToAdd = [];
-        // let scores = [];
-        // for (let i = 0; i < 10; i++) {
-        //     const score = await osuService.getScore(scoreIdsToAdd[i]);
-        //     scores.push(score);
-        // }
-        // // find the bounty that has the id of the scores
-        // for (const bounty of match.bounties) {
-        //     for (const score of scores) {
-        //         if (bounty.beatmapId === score.beatmapId.toString()) {
-        //             bounty.scores.push(score);
-        //         }
+        // const leaderboards = match.scoreLeaderboards;
+        // for (const lb of leaderboards) {
+        //     if (lb.lowerRank === 1) {
+        //         const play = await osuService.getScore('5956532216');
+        //         console.log
+        //         const score = new OsuScore({
+        //             _id: play.id,
+        //             userId: 6404488,
+        //             accuracy: play.accuracy,
+        //             count300: play.count300,
+        //             count100: play.count100,
+        //             count50: play.count50,
+        //             countMiss: play.countMiss,
+        //             maxCombo: play.maxCombo,
+        //             beatmapMaxCombo: play.beatmapMaxCombo,
+        //             difficulty: play.difficulty,
+        //             pp: play.pp,
+        //             rank: play.rank,
+        //             score: play.score,
+        //             mods: play.mods,
+        //             created_at: play.createdAt,
+        //             mode: play.mode,
+        //             passed: play.passed,
+        //             beatmapId: play.beatmapId,
+        //             beatmapSetId: play.beatmapSetId,
+        //             status: play.status,
+        //             title: play.title,
+        //             version: play.version,
+        //             url: play.url,
+        //             list: play.list,
+        //             teamName: 'South',
+        //         });
+        //         lb.scores.push(score);
+        //         await match.save();
         //     }
         // }
-
-        // await match.save();
-        const lbs = match.leaderboards;
-        const userId = '21587761';
-
-        // Find the source leaderboard (5000-999999)
-        const sourceLb = lbs.find(
-            lb => lb.mode === OsuMode.MANIA && lb.lowerRank === 5000 && lb.upperRank === 999999
-        );
-        // Find the target leaderboard (1000-4999)
-        const targetLb = lbs.find(
-            lb => lb.mode === OsuMode.MANIA && lb.lowerRank === 1000 && lb.upperRank === 4999
-        );
-
-        if (!sourceLb || !targetLb) {
-            await InteractionUtils.send(intr, 'Leaderboards not found!');
-            return;
-        }
-
-        // Find and collect scores to move
-        const scoresToMove = sourceLb.scores.filter((s: any) => s.userId === userId);
-
-        console.log(
-            `Moving ${scoresToMove.length} scores from ${sourceLb.lowerRank}-${sourceLb.upperRank} to ${targetLb.lowerRank}-${targetLb.upperRank}`
-        );
-
-        // Remove scores from source leaderboard
-        sourceLb.scores = sourceLb.scores.filter((s: any) => s.userId !== userId);
-
-        // Add scores to target leaderboard using ScoreManagementUtils
-        for (const score of scoresToMove) {
-            ScoreManagementUtils.manageActiveScoresOnAdd(targetLb, score);
-        }
-
-        await match.save();
-
-        await InteractionUtils.send(intr, `Moved ${scoresToMove.length} scores for user ${userId}`);
         await InteractionUtils.send(intr, Lang.getEmbed('displayEmbeds.test', data.lang));
     }
 }
