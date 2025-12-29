@@ -98,65 +98,69 @@ export class PpSubmitBountyCommand {
         const playModsSet = new Set(play.mods);
         const bountyMod = beatmapBounty.mod;
         let bountyModMet = false;
+        // remove NF from mod list
+        const filteredMods = play.mods.filter(mod => mod !== OsuMod.NF);
         switch (bountyMod) {
             case OsuMod.NM:
-                if (play.mods.length === 0) {
+                if (filteredMods.length === 0) {
                     bountyModMet = true;
                 }
                 break;
             case OsuMod.HD:
-                if (play.mods.length === 1 && playModsSet.has(OsuMod.HD)) {
+                if (filteredMods.length === 1 && playModsSet.has(OsuMod.HD)) {
                     bountyModMet = true;
                 }
                 break;
             case OsuMod.HR:
-                if (play.mods.length === 1 && playModsSet.has(OsuMod.HR)) {
+                if (filteredMods.length === 1 && playModsSet.has(OsuMod.HR)) {
                     bountyModMet = true;
                 }
                 break;
             case OsuMod.DT:
-                if (play.mods.length === 1 &&
-                    (playModsSet.has(OsuMod.DT) || playModsSet.has(OsuMod.NC))) {
-                    bountyModMet = true;
+                if (playModsSet.has(OsuMod.DT) || playModsSet.has(OsuMod.NC)) {
+                    if (filteredMods.length === 1 ||
+                        (filteredMods.length === 2 && filteredMods.includes(OsuMod.HD))) {
+                        bountyModMet = true;
+                    }
                 }
                 break;
             case OsuMod.EZ:
-                if (play.mods.length === 1 && playModsSet.has(OsuMod.EZ)) {
+                if (filteredMods.length === 1 && playModsSet.has(OsuMod.EZ)) {
                     bountyModMet = true;
                 }
                 break;
             case OsuMod.FM:
-                if (play.mods.length === 2 &&
+                if (filteredMods.length === 2 &&
                     playModsSet.has(OsuMod.HD) &&
                     playModsSet.has(OsuMod.HR)) {
                     bountyModMet = true;
                 }
-                if (play.mods.length === 1 &&
+                if (filteredMods.length === 1 &&
                     (playModsSet.has(OsuMod.HD) || playModsSet.has(OsuMod.HR))) {
                     bountyModMet = true;
                 }
-                if (play.mods.length === 0) {
+                if (filteredMods.length === 0) {
                     bountyModMet = true;
                 }
                 break;
             case OsuMod.FoM:
-                if (play.mods.length === 2 &&
+                if (filteredMods.length === 2 &&
                     playModsSet.has(OsuMod.HD) &&
                     playModsSet.has(OsuMod.HR)) {
                     bountyModMet = true;
                 }
-                if (play.mods.length === 1 &&
+                if (filteredMods.length === 1 &&
                     (playModsSet.has(OsuMod.HD) || playModsSet.has(OsuMod.HR))) {
                     bountyModMet = true;
                 }
                 break;
         }
         if (!bountyModMet) {
-            await InteractionUtils.send(intr, `Your play does not meet the mod requirement for the bounty (Required: ${bountyMod}, Your Mods: ${play.mods.length > 0 ? play.mods.join('') : 'NM'})`);
+            await InteractionUtils.send(intr, `Your play does not meet the mod requirement for the bounty (Required: ${bountyMod}, Your Mods: ${filteredMods.length > 0 ? filteredMods.join('') : 'NM'})`);
             return;
         }
         // switch case for each win condition and check if it is met
-        let bountyWon = false;
+        let bountyWon = true;
         switch (beatmapBounty.winCondition) {
             case BountyWinCondition.ACCURACY:
                 bountyWon = true;
