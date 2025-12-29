@@ -164,7 +164,9 @@ export class PpSubmitBountyCommand implements Command {
                 }
                 if (
                     filteredMods.length === 1 &&
-                    (playModsSet.has(OsuMod.HD) || playModsSet.has(OsuMod.HR))
+                    (playModsSet.has(OsuMod.HD) ||
+                        playModsSet.has(OsuMod.HR) ||
+                        playModsSet.has(OsuMod.EZ))
                 ) {
                     bountyModMet = true;
                 }
