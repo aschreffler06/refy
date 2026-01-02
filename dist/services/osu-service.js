@@ -19,7 +19,7 @@ export class OsuService {
         };
         try {
             const token = await Token.findOne({ _id: 1 }).exec();
-            if (token.isExpired() || !token || forceNew) {
+            if (!token || token.isExpired() || forceNew) {
                 const response = await axios.post('https://osu.ppy.sh/oauth/token', bodyParameters);
                 const newToken = new Token({
                     _id: 1,
