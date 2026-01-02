@@ -20,7 +20,7 @@
         "format:fix": "prettier --write .",
         "clean": "git clean -xdf --exclude=\"/config/**/*\"",
         "clean:dry": "git clean -xdf --exclude=\"/config/**/*\" --dry-run",
-        "build": "tsc --project tsconfig.json",
+        "build": "node --max-old-space-size=4096 ./node_modules/.bin/tsc --project tsconfig.json",
         "commands:view": "npm run build && node --enable-source-maps dist/start-bot.js commands view",
         "commands:register": "npm run build && node --enable-source-maps dist/start-bot.js commands register",
         "commands:rename": "npm run build && node --enable-source-maps dist/start-bot.js commands rename",
