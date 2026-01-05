@@ -339,7 +339,7 @@ export class PpSubmitBountyCommand implements Command {
                 );
                 return;
             }
-            beatmapBounty.winningTeam = scores[0].teamName;
+            // beatmapBounty.winningTeam = scores[0].teamName;
             await match.save();
 
             // Find the score's position in the leaderboard by ID

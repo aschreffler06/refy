@@ -81,8 +81,61 @@ export class PpBountyScoresCommand {
             leaderboardText += `**${i + 1}.** ${username} - ${scoreValue} | ${score.teamName}\n`;
         }
         embed.setDescription(leaderboardText || 'No scores yet!');
+        // Calculate team scores
+        const teamScores = new Map();
+        // Points mapping: 1st=15, 2nd=12, 3rd=10, 4th=8, then decrease by 1 until 12th=0
+        const pointsMap = new Map([
+            [1, 15],
+            [2, 12],
+            [3, 10],
+            [4, 8],
+            [5, 7],
+            [6, 6],
+            [7, 5],
+            [8, 4],
+            [9, 3],
+            [10, 2],
+            [11, 1],
+            [12, 0],
+        ]);
+        // Award points based on position in the scores array (already sorted)
+        for (let i = 0; i < scores.length; i++) {
+            const score = scores[i];
+            if (score.teamName) {
+                const points = pointsMap.get(i + 1) ?? 0; // Default to 0 for positions beyond 12th
+                const currentPoints = teamScores.get(score.teamName) || 0;
+                teamScores.set(score.teamName, currentPoints + points);
+            }
+        }
+        // Find winning team
+        let winningTeam = null;
+        let maxPoints = -1;
+        for (const [team, points] of teamScores.entries()) {
+            if (points > maxPoints) {
+                maxPoints = points;
+                winningTeam = team;
+            }
+        }
+        // Update bounty with winning team
+        if (winningTeam) {
+            bounty.winningTeam = winningTeam;
+            await match.save();
+        }
+        // Add team scores to embed
+        if (teamScores.size > 0) {
+            let teamScoresText = '';
+            const sortedTeams = Array.from(teamScores.entries()).sort((a, b) => b[1] - a[1]);
+            for (const [team, points] of sortedTeams) {
+                teamScoresText += `${team}: ${points} points\n`;
+            }
+            embed.addFields({
+                name: 'Team Scores',
+                value: teamScoresText,
+                inline: false,
+            });
+        }
         if (bounty.winningTeam) {
-            embed.setFooter({ text: `Winning Team: ${bounty.winningTeam}` });
+            embed.setFooter({ text: `Winning Team: ${bounty.winningTeam} 🏆` });
         }
         await InteractionUtils.send(intr, { embeds: [embed] });
     }

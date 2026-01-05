@@ -293,7 +293,7 @@ export class PpSubmitBountyCommand {
                 await InteractionUtils.send(intr, `Your play was good enough to meet the bounty condition, but not high enough to be in the top 11 for this bounty`);
                 return;
             }
-            beatmapBounty.winningTeam = scores[0].teamName;
+            // beatmapBounty.winningTeam = scores[0].teamName;
             await match.save();
             // Find the score's position in the leaderboard by ID
             const scorePosition = scores.findIndex(s => s._id.toString() === score._id.toString()) + 1;

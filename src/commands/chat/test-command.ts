@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
+import { Player, PpMatch } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
@@ -14,7 +15,14 @@ export class TestCommand implements Command {
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
-        // const match = await PpMatch.findOne({ name: 'osu! Civil War' }).exec();
+        const match = await PpMatch.findOne({ name: 'osu! Civil War' }).exec();
+        const player = await Player.findOne({ username: 'goldenyoshi22' }).exec();
+        console.log(player);
+        console.log(
+            match.teams
+                .find(t => t.name === 'South')
+                .players.find(p => p.username === 'Nonfakegamer')
+        );
         // const osuService = new OsuService();
         // const leaderboards = match.scoreLeaderboards;
         // for (const lb of leaderboards) {

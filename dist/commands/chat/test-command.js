@@ -1,4 +1,5 @@
 import { RateLimiter } from 'discord.js-rate-limiter';
+import { Player, PpMatch } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { Lang } from '../../services/index.js';
 import { InteractionUtils } from '../../utils/index.js';
@@ -11,7 +12,12 @@ export class TestCommand {
         this.requireClientPerms = [];
     }
     async execute(intr, data) {
-        // const match = await PpMatch.findOne({ name: 'osu! Civil War' }).exec();
+        const match = await PpMatch.findOne({ name: 'osu! Civil War' }).exec();
+        const player = await Player.findOne({ username: 'goldenyoshi22' }).exec();
+        console.log(player);
+        console.log(match.teams
+            .find(t => t.name === 'South')
+            .players.find(p => p.username === 'Nonfakegamer'));
         // const osuService = new OsuService();
         // const leaderboards = match.scoreLeaderboards;
         // for (const lb of leaderboards) {
