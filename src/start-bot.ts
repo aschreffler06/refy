@@ -28,6 +28,8 @@ import {
     PpSubmitPlayCommand,
     PpToggleSnipeNotifyCommand,
     PpUserStatsCommand,
+    ScoreGetScoreCommand,
+    ScoreUserStatsCommand,
     TestCommand,
 } from './commands/chat/index.js';
 import {
@@ -114,6 +116,8 @@ async function start(): Promise<void> {
         new PpSubmitPlayCommand(),
         new PpToggleSnipeNotifyCommand(),
         new PpUserStatsCommand(),
+        new ScoreGetScoreCommand(),
+        new ScoreUserStatsCommand(),
 
         // Message Context Commands
         new ViewDateSent(),

@@ -375,6 +375,36 @@ export const ChatCommandMetadata: {
             },
         ],
     },
+    SCORE_GET_SCORE: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.scoreGetScore', Language.Default),
+        description: Lang.getRef('commandDescs.scoreGetScore', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+        options: [
+            {
+                ...Args.ID,
+                required: true,
+            },
+            {
+                ...Args.MODE,
+                required: false,
+            },
+        ],
+    },
+    SCORE_USER_STATS: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.scoreUserStats', Language.Default),
+        description: Lang.getRef('commandDescs.scoreUserStats', Language.Default),
+        dm_permission: true,
+        default_member_permissions: undefined,
+        options: [
+            {
+                ...Args.MODE,
+                required: false,
+            },
+        ],
+    },
 };
 
 export const MessageCommandMetadata: {

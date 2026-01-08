@@ -11,7 +11,7 @@ import {
 // CreateTicketCommand,
 // HelpCommand,
 // InfoCommand,
-LinkCommand, PpBountyScoresCommand, PpCreateBountyCommand, PpCreateLeaderboardCommand, PpCreateMatchCommand, PpCreateTeamCommand, PpDisplayCommand, PpDisplayTotalCommand, PpGetScoreCommand, PpJoinTeamCommand, PpSetUpdatesChannelCommand, PpSubmitBountyCommand, PpSubmitPlayCommand, PpToggleSnipeNotifyCommand, PpUserStatsCommand, TestCommand, } from './commands/chat/index.js';
+LinkCommand, PpBountyScoresCommand, PpCreateBountyCommand, PpCreateLeaderboardCommand, PpCreateMatchCommand, PpCreateTeamCommand, PpDisplayCommand, PpDisplayTotalCommand, PpGetScoreCommand, PpJoinTeamCommand, PpSetUpdatesChannelCommand, PpSubmitBountyCommand, PpSubmitPlayCommand, PpToggleSnipeNotifyCommand, PpUserStatsCommand, ScoreGetScoreCommand, ScoreUserStatsCommand, TestCommand, } from './commands/chat/index.js';
 import { ChatCommandMetadata, MessageCommandMetadata, UserCommandMetadata, } from './commands/index.js';
 import { ViewDateSent } from './commands/message/index.js';
 import { ViewDateJoined } from './commands/user/index.js';
@@ -69,6 +69,8 @@ async function start() {
         new PpSubmitPlayCommand(),
         new PpToggleSnipeNotifyCommand(),
         new PpUserStatsCommand(),
+        new ScoreGetScoreCommand(),
+        new ScoreUserStatsCommand(),
         // Message Context Commands
         new ViewDateSent(),
         // User Context Commands

@@ -31,7 +31,9 @@ export class PpUserStatsCommand {
                 break;
             }
         }
-        scores = scores.filter(score => score.teamName === teamName).sort((a, b) => b.pp - a.pp);
+        scores = scores
+            .filter(score => score.teamName === teamName && score.isActive)
+            .sort((a, b) => b.pp - a.pp);
         let totalPp = 0;
         let totalPlays = 0;
         for (let i = 0; i < scores.length && i < 100; i++) {

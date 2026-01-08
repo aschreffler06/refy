@@ -217,7 +217,9 @@
             "ppSubmitBounty": "pp-submit-bounty",
             "ppSubmitPlay": "pp-submit-play",
             "ppToggleSnipeNotify": "pp-toggle-snipe-notify",
-            "ppUserStats": "pp-user-stats"
+            "ppUserStats": "pp-user-stats",
+            "scoreGetScore": "score-get-score",
+            "scoreUserStats": "score-user-stats"
         },
         "userCommands": {
             "viewDateJoined": "View Date Joined"
@@ -270,6 +272,8 @@
             "ppSubmitPlay": "Submit a play for the leaderboard for your team.",
             "ppToggleSnipeNotify": "Toggle notifications when your top score is sniped",
             "ppUserStats": "View your total plays and pp contributed",
+            "scoreGetScore": "Given an osu beatmap id, get the current leaderboard score for that map",
+            "scoreUserStats": "View your total plays and score contributed",
             "link": "Link your osu account"
         },
         "argDescs": {

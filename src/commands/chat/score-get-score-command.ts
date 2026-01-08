@@ -9,14 +9,15 @@ import { Lang } from '../../services/index.js';
 import { InteractionUtils, PpLeaderboardUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 
-export class PpUserStatsCommand implements Command {
-    public names = [Lang.getRef('chatCommands.ppUserStats', Language.Default)];
+export class ScoreGetScoreCommand implements Command {
+    public names = [Lang.getRef('chatCommands.scoreGetScore', Language.Default)];
     public cooldown = new RateLimiter(1, 5000);
-    public deferType = CommandDeferType.PUBLIC;
+    public deferType = CommandDeferType.NONE;
     public requireClientPerms: PermissionsString[] = [];
 
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
         const args = {
+            id: intr.options.getString(Lang.getRef('arguments.id', data.lang)),
             mode: intr.options.getString(Lang.getRef('arguments.mode', data.lang)),
         };
 
@@ -25,36 +26,23 @@ export class PpUserStatsCommand implements Command {
             guildId: intr.guildId,
             status: MatchStatus.ACTIVE,
         }).exec();
+        if (!match) {
+            await InteractionUtils.send(intr, 'Match not found!');
+            return;
+        }
+
         const player = await Player.findOne({ discord: intr.user.id }).exec();
-        const leaderboard = PpLeaderboardUtils.getPlayerLeaderboard(
-            player,
-            match.leaderboards,
-            mode
+        const playerRank = player.rank;
+        const scoreLb = match.scoreLeaderboards.find(
+            lb => lb.mode === mode && lb.lowerRank <= playerRank && lb.upperRank >= playerRank
         );
-
-        let scores = leaderboard.scores;
-        let teamName = '';
-        for (let i = 0; i < scores.length; i++) {
-            if (scores[i].userId == player.id) {
-                teamName = scores[i].teamName;
-                break;
-            }
+        const score = scoreLb.scores.find(s => s.beatmapId.toString() === args.id);
+        if (!score) {
+            await InteractionUtils.send(intr, 'Score not found!');
+            return;
         }
-        scores = scores
-            .filter(score => score.teamName === teamName && score.isActive)
-            .sort((a, b) => b.pp - a.pp);
-        let totalPp = 0;
-        let totalPlays = 0;
-        for (let i = 0; i < scores.length && i < 100; i++) {
-            if (scores[i].userId == player.id) {
-                totalPp += scores[i].pp * Math.pow(0.98, i);
-                totalPlays += 1;
-            }
-        }
+        const scoreEmbed = await PpLeaderboardUtils.createScoreEmbed(player, score, scoreLb);
 
-        await InteractionUtils.send(
-            intr,
-            `You have ${totalPlays} plays worth **${totalPp.toFixed(2)}** pp for your leaderboard!`
-        );
+        await InteractionUtils.send(intr, scoreEmbed);
     }
 }

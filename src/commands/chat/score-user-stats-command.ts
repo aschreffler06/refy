@@ -6,11 +6,11 @@ import { Player, PpMatch } from '../../models/database/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
-import { InteractionUtils, PpLeaderboardUtils } from '../../utils/index.js';
+import { InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 
-export class PpUserStatsCommand implements Command {
-    public names = [Lang.getRef('chatCommands.ppUserStats', Language.Default)];
+export class ScoreUserStatsCommand implements Command {
+    public names = [Lang.getRef('chatCommands.scoreUserStats', Language.Default)];
     public cooldown = new RateLimiter(1, 5000);
     public deferType = CommandDeferType.PUBLIC;
     public requireClientPerms: PermissionsString[] = [];
@@ -26,13 +26,12 @@ export class PpUserStatsCommand implements Command {
             status: MatchStatus.ACTIVE,
         }).exec();
         const player = await Player.findOne({ discord: intr.user.id }).exec();
-        const leaderboard = PpLeaderboardUtils.getPlayerLeaderboard(
-            player,
-            match.leaderboards,
-            mode
+        const playerRank = player.rank;
+        const scoreLb = match.scoreLeaderboards.find(
+            lb => lb.mode === mode && lb.lowerRank <= playerRank && lb.upperRank >= playerRank
         );
 
-        let scores = leaderboard.scores;
+        let scores = scoreLb.scores;
         let teamName = '';
         for (let i = 0; i < scores.length; i++) {
             if (scores[i].userId == player.id) {
@@ -40,21 +39,21 @@ export class PpUserStatsCommand implements Command {
                 break;
             }
         }
-        scores = scores
-            .filter(score => score.teamName === teamName && score.isActive)
-            .sort((a, b) => b.pp - a.pp);
-        let totalPp = 0;
+        scores = scores.filter(score => score.teamName === teamName);
+        let totalScore = 0;
         let totalPlays = 0;
         for (let i = 0; i < scores.length && i < 100; i++) {
             if (scores[i].userId == player.id) {
-                totalPp += scores[i].pp * Math.pow(0.98, i);
+                totalScore += scores[i].score;
                 totalPlays += 1;
             }
         }
 
         await InteractionUtils.send(
             intr,
-            `You have ${totalPlays} plays worth **${totalPp.toFixed(2)}** pp for your leaderboard!`
+            `You have ${totalPlays} plays worth **${totalScore.toFixed(
+                2
+            )}** score for your leaderboard!`
         );
     }
 }
