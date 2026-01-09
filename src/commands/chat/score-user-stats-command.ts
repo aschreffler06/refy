@@ -42,9 +42,9 @@ export class ScoreUserStatsCommand implements Command {
         scores = scores.filter(score => score.teamName === teamName);
         let totalScore = 0;
         let totalPlays = 0;
-        for (let i = 0; i < scores.length && i < 100; i++) {
-            if (scores[i].userId == player.id) {
-                totalScore += scores[i].score;
+        for (const score of scores) {
+            if (score.userId == player.id) {
+                totalScore += score.score;
                 totalPlays += 1;
             }
         }
