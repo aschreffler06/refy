@@ -61,6 +61,8 @@ export class PpSubmitBountyCommand implements Command {
             count100: play.count100,
             count50: play.count50,
             countMiss: play.countMiss,
+            countGeki: play.countGeki,
+            countKatu: play.countKatu,
             maxCombo: play.maxCombo,
             beatmapMaxCombo: play.beatmapMaxCombo,
             difficulty: play.difficulty,
@@ -80,6 +82,24 @@ export class PpSubmitBountyCommand implements Command {
             list: play.list,
             teamName: '',
         });
+
+        if (score.mode === OsuMode.MANIA) {
+            let sumAcc =
+                score.count300 * 300 +
+                score.countKatu * 200 +
+                score.count100 * 100 +
+                score.count50 * 50;
+            const totalHits =
+                score.countGeki +
+                score.count300 +
+                score.countKatu +
+                score.count100 +
+                score.count50 +
+                score.countMiss;
+            sumAcc = sumAcc * 0.9836065573770492;
+            sumAcc = sumAcc + score.countGeki * 300;
+            score.accuracy = sumAcc / (totalHits * 300);
+        }
 
         // Get the active match for this guild
         const match = await PpMatch.findOne({

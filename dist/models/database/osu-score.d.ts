@@ -32,6 +32,8 @@ interface IOsuScore {
     count100: number;
     count50: number;
     countMiss: number;
+    countGeki: number;
+    countKatu: number;
     maxCombo: number;
     beatmapMaxCombo: number;
     difficulty: number;

@@ -10,6 +10,8 @@ interface IOsuScore {
     count100: number;
     count50: number;
     countMiss: number;
+    countGeki: number;
+    countKatu: number;
     maxCombo: number;
     beatmapMaxCombo: number;
     difficulty: number;
@@ -40,6 +42,8 @@ const osuScoreSchema = new Schema<IOsuScore>({
     count100: { type: Number, required: true },
     count50: { type: Number, required: false },
     countMiss: { type: Number, required: true },
+    countGeki: { type: Number, required: false },
+    countKatu: { type: Number, required: false },
     maxCombo: { type: Number, required: true },
     beatmapMaxCombo: { type: Number, required: true },
     difficulty: { type: Number, required: true },

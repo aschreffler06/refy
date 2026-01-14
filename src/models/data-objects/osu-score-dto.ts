@@ -14,6 +14,8 @@ export class OsuScoreDTO {
     count100: number;
     count50: number;
     countMiss: number;
+    countGeki: number;
+    countKatu: number;
     maxCombo: number;
     beatmapMaxCombo: number;
     difficulty: number;
@@ -41,6 +43,8 @@ export class OsuScoreDTO {
         number100s: number,
         number50s: number,
         numberMisses: number,
+        countGeki: number,
+        countKatu: number,
         maxCombo: number,
         beatmapMaxCombo: number,
         difficulty: number,
@@ -66,6 +70,8 @@ export class OsuScoreDTO {
         this.count100 = number100s;
         this.count50 = number50s;
         this.countMiss = numberMisses;
+        this.countGeki = countGeki;
+        this.countKatu = countKatu;
         this.maxCombo = maxCombo;
         this.beatmapMaxCombo = beatmapMaxCombo;
         this.difficulty = difficulty;

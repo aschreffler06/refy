@@ -2,7 +2,7 @@
  * A class to hold information about a user.
  */
 export class OsuScoreDTO {
-    constructor(id, userId, accuracy, number300s, number100s, number50s, numberMisses, maxCombo, beatmapMaxCombo, difficulty, pp, rank, score, mods, createdAt, mode, passed, beatmapSetId, beatmapId, status, title, version, url, list) {
+    constructor(id, userId, accuracy, number300s, number100s, number50s, numberMisses, countGeki, countKatu, maxCombo, beatmapMaxCombo, difficulty, pp, rank, score, mods, createdAt, mode, passed, beatmapSetId, beatmapId, status, title, version, url, list) {
         this.id = id;
         this.userId = userId;
         this.accuracy = accuracy;
@@ -10,6 +10,8 @@ export class OsuScoreDTO {
         this.count100 = number100s;
         this.count50 = number50s;
         this.countMiss = numberMisses;
+        this.countGeki = countGeki;
+        this.countKatu = countKatu;
         this.maxCombo = maxCombo;
         this.beatmapMaxCombo = beatmapMaxCombo;
         this.difficulty = difficulty;

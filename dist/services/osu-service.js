@@ -114,7 +114,7 @@ export class OsuService {
         }
         const scores = [];
         for (const play of recentPlays.data) {
-            scores.push(new OsuScoreDTO(play.id, play.user.id, play.accuracy, play.statistics.count_300, play.statistics.count_100, play.statistics.count_50, play.statistics.count_miss, play.max_combo, await this.getBeatmapCombo(play.beatmap.id), await this.getBeatmapModdedDifficulty(play.beatmap.id, play.mods), play.pp, play.rank, play.score, play.mods, Math.trunc(new Date(play.created_at).getTime() / 1000), play.mode, play.passed, play.beatmap.beatmapset_id, play.beatmap.id, play.beatmap.status, play.beatmapset.title, play.beatmap.version, play.beatmap.url, play.beatmapset.covers.list));
+            scores.push(new OsuScoreDTO(play.id, play.user.id, play.accuracy, play.statistics.count_300, play.statistics.count_100, play.statistics.count_50, play.statistics.count_miss, play.statistics.count_geki, play.statistics.count_katu, play.max_combo, await this.getBeatmapCombo(play.beatmap.id), await this.getBeatmapModdedDifficulty(play.beatmap.id, play.mods), play.pp, play.rank, play.score, play.mods, Math.trunc(new Date(play.created_at).getTime() / 1000), play.mode, play.passed, play.beatmap.beatmapset_id, play.beatmap.id, play.beatmap.status, play.beatmapset.title, play.beatmap.version, play.beatmap.url, play.beatmapset.covers.list));
         }
         return scores;
     }
@@ -135,7 +135,7 @@ export class OsuService {
             throw new Error('Failed to fetch score from osu! API');
         }
         const play = scoreData.data;
-        return new OsuScoreDTO(play.id, play.user.id, play.accuracy, play.statistics.count_300, play.statistics.count_100, play.statistics.count_50, play.statistics.count_miss, play.max_combo, await this.getBeatmapCombo(play.beatmap.id), await this.getBeatmapModdedDifficulty(play.beatmap.id, play.mods), play.pp, play.rank, play.score, play.mods, Math.trunc(new Date(play.created_at).getTime() / 1000), play.mode, play.passed, play.beatmap.beatmapset_id, play.beatmap.id, play.beatmap.status, play.beatmapset.title, play.beatmap.version, play.beatmap.url, play.beatmapset.covers.list);
+        return new OsuScoreDTO(play.id, play.user.id, play.accuracy, play.statistics.count_300, play.statistics.count_100, play.statistics.count_50, play.statistics.count_miss, play.statistics.count_geki, play.statistics.count_katu, play.max_combo, await this.getBeatmapCombo(play.beatmap.id), await this.getBeatmapModdedDifficulty(play.beatmap.id, play.mods), play.pp, play.rank, play.score, play.mods, Math.trunc(new Date(play.created_at).getTime() / 1000), play.mode, play.passed, play.beatmap.beatmapset_id, play.beatmap.id, play.beatmap.status, play.beatmapset.title, play.beatmap.version, play.beatmap.url, play.beatmapset.covers.list);
     }
     async getBeatmapCombo(beatmapId) {
         const token = await this.getAuthToken();
