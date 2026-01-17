@@ -224,10 +224,18 @@ export class PpSubmitBountyCommand {
                                     score.created_at < existingScore.created_at);
                         break;
                     case BountyWinCondition.SCORE:
-                        isNewScoreBetter =
-                            score.score > existingScore.score ||
-                                (score.score === existingScore.score &&
-                                    score.created_at < existingScore.created_at);
+                        if (score.beatmapId === '4564382' && score.mode === OsuMode.CATCH) {
+                            isNewScoreBetter =
+                                score.score < existingScore.score ||
+                                    (score.score === existingScore.score &&
+                                        score.created_at < existingScore.created_at);
+                        }
+                        else {
+                            isNewScoreBetter =
+                                score.score > existingScore.score ||
+                                    (score.score === existingScore.score &&
+                                        score.created_at < existingScore.created_at);
+                        }
                         break;
                     case BountyWinCondition.MISS_COUNT:
                         isNewScoreBetter =
